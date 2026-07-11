@@ -12,10 +12,10 @@
 
 `rtl-lsp` использует чистое Rust-ядро pyregtab
 (`default-features = false` — без pyo3). Пока пререквизитная работа
-(cargo-фича `python`, `compile_permissive`, позиции ошибок) живёт в ветке
-`rtl-lsp-core` pyregtab и не выпущена релизом, зависимость — **path**
-на соседний checkout: `../../pyregtab` (ветка `rtl-lsp-core` должна быть
-выкачана). CI раскладывает репозитории так же (checkout pyregtab рядом).
+(cargo-фича `python`, `compile_permissive`, позиции ошибок) живёт в main
+pyregtab и не выпущена релизом, зависимость — **path**
+на соседний checkout: `../../pyregtab` (его main должен быть
+выкачан). CI раскладывает репозитории так же (checkout pyregtab рядом).
 После релиза pyregtab с этой работой зависимость переключается на
 закреплённый git-тег (план §3.2).
 

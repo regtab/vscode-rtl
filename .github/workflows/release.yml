@@ -3,8 +3,7 @@
 # Marketplace and Open VSX, attach everything to a GitHub Release.
 #
 # Publishing happens only on an explicit tag push by a maintainer.
-# Secrets: VSCE_PAT (Azure DevOps, publisher `regtab`), OVSX_PAT (Eclipse),
-# optionally PYREGTAB_TOKEN (read access to pyregtab if it is private).
+# Secrets: VSCE_PAT (Azure DevOps, publisher `regtab`), OVSX_PAT (Eclipse).
 name: Release
 
 on:
@@ -54,9 +53,8 @@ jobs:
       - uses: actions/checkout@v4
         with:
           repository: regtab/pyregtab
-          ref: rtl-lsp-core
+          ref: main
           path: pyregtab
-          token: ${{ secrets.PYREGTAB_TOKEN || github.token }}
 
       - uses: dtolnay/rust-toolchain@stable
         with:

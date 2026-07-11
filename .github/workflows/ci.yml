@@ -52,8 +52,8 @@ jobs:
 
   # rtl-lsp: cargo tests over the conformance corpus, then the e2e smoke
   # against a real VS Code with the freshly built server bundled in bin/.
-  # The pyregtab core is a sibling-checkout path dependency until its
-  # `rtl-lsp-core` branch ships in a release (then: pinned git tag).
+  # The pyregtab core is a sibling-checkout path dependency (pyregtab main) until
+  # it ships in a release (then: pinned git tag, plan §3.2).
   server:
     runs-on: ubuntu-latest
     steps:
@@ -64,9 +64,8 @@ jobs:
       - uses: actions/checkout@v4
         with:
           repository: regtab/pyregtab
-          ref: rtl-lsp-core
+          ref: main
           path: pyregtab
-          token: ${{ secrets.PYREGTAB_TOKEN || github.token }}
 
       - uses: dtolnay/rust-toolchain@stable
         with:

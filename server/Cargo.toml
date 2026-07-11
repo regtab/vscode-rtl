@@ -11,9 +11,8 @@ path = "src/main.rs"
 
 [dependencies]
 # The pure-Rust RTL compiler core (plan §3.2). Interim: a sibling-checkout
-# path dependency, because the prerequisite work lives on pyregtab's
-# `rtl-lsp-core` branch and is not yet on GitHub (CI checks the branch out
-# next to this repository). Switch to the planned pinned git dependency
+# path dependency on pyregtab main (CI checks it out next to this
+# repository). Switch to the planned pinned git dependency
 # (`git = "https://github.com/regtab/pyregtab.git", tag = "v0.4.0"`) once
 # pyregtab releases a version containing the `python` feature split.
 pyregtab = { path = "../../pyregtab", default-features = false }

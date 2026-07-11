@@ -5,6 +5,19 @@ The extension follows [semver](https://semver.org) independently of
 jRegTab/pyRegTab versions; the pinned normative grammar version is recorded
 in the README.
 
+## 0.3.0
+
+- Hover reference for every RTL keyword — spatial/positional/content
+  constraints, actions, extractors, settings, `EXT`, quantifiers, `->`, tags,
+  fragments. Content is generated from the normative RTL reference
+  (`docs/rtl-reference.md` in pyRegTab) by `tools/gen_hover_data.py`.
+- Context-aware completion: actions after `->`, extractors after `=`,
+  declared fragments after `$`, known tags after `#`, settings inside `<…>`,
+  constraints/directives elsewhere.
+- `$fragment` navigation: go to definition, find references, rename
+  (definition + all references, case-insensitive), and document symbols
+  (fragments, subtables, rows) for Outline/breadcrumbs.
+
 ## 0.2.0
 
 - Compile diagnostics via `rtl-lsp`, a standalone native language server built

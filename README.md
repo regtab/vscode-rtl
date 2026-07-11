@@ -25,6 +25,12 @@ runtime at all.
   (they bind to the host runtime only at run time). Platform-specific builds
   bundle the server; on other platforms point `rtl.server.path` at your own
   binary, or use the extension with highlighting only.
+- **Hover reference** on every RTL keyword — constraint semantics, action
+  effects, extractor behavior — generated from the normative RTL reference.
+- **Context-aware completion** — actions after `->`, extractors after `=`,
+  declared `$fragments`, known `#'tags'`, settings inside `<…>`.
+- **`$fragment` navigation** — go to definition, find references, rename,
+  and an Outline view of fragments, subtables and rows.
 - **Syntax highlighting for `.rtl` files** — keywords, actions, providers,
   extractors, fragments (`$NAME`), tags (`#'…'`), strings, comments, quantifiers.
 - **RTL inside Python strings** — literals passed to `RtlCompiler.compile("…")`
@@ -69,7 +75,6 @@ var atp = RtlCompiler.compile("[ [VAL: 'LABEL'->AVP] ]+");
 
 ## Roadmap
 
-- Hover reference, completion, `$fragment` navigation and rename.
 - Live match preview: run a pattern against a CSV fixture with cell-role
   coloring and the extracted record set.
 

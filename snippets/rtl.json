@@ -1,0 +1,65 @@
+{
+  "Record from subtable values": {
+    "prefix": "strec",
+    "body": "ST*->REC",
+    "description": "Collect all same-subtable values into one record"
+  },
+  "Record from subcolumn headers + subrow": {
+    "prefix": "screc",
+    "body": "(SC{${1:2}}, SR)->REC(${2:2})",
+    "description": "N items from the same subcolumn (headers) + one from the same subrow"
+  },
+  "Attribute from same column (column-major)": {
+    "prefix": "colavp",
+    "body": "^COL->AVP",
+    "description": "Associate with an attribute from the same column, column-major traversal"
+  },
+  "Fixed string attribute": {
+    "prefix": "labelavp",
+    "body": "('${1:LABEL}')->AVP",
+    "description": "Associate with a constant string attribute"
+  },
+  "Join same-cell item": {
+    "prefix": "cljoin",
+    "body": "CL->JOIN(${1:0})",
+    "description": "Join (drop anchor) another item from the same cell"
+  },
+  "Fill forward from same column": {
+    "prefix": "colfill",
+    "body": "(COL)->FILL('${1:/}')",
+    "description": "Fill forward from same-column values with a delimiter"
+  },
+  "Prefix with nearest value above": {
+    "prefix": "avprefix",
+    "body": "-AV->PREFIX('${1:, }')",
+    "description": "Prepend the nearest value above, with a separator"
+  },
+  "Table skeleton: header row + data rows": {
+    "prefix": "table",
+    "body": [
+      "[ [${1:ATTR}]+ ]",
+      "[ [${2:VAL : ST*->REC}]+ ]+"
+    ],
+    "description": "Header row of attributes followed by repeated rows of values"
+  },
+  "Row skeleton": {
+    "prefix": "row",
+    "body": "[ [${1:VAL}] [${2:VAL : ST*->REC}]+ ]+",
+    "description": "Row pattern: first cell + repeated cells"
+  },
+  "Named fragment definition": {
+    "prefix": "frag",
+    "body": "\\$${1:NAME}=[${2:VAL}]",
+    "description": "Declare a named cell fragment: $NAME=[cellBody]"
+  },
+  "Settings prefix": {
+    "prefix": "settings",
+    "body": "<NORM, ANCH(${1:1})>",
+    "description": "Table pattern settings: normalization and anchor column"
+  },
+  "Conditional cell": {
+    "prefix": "condcell",
+    "body": "[${1:'${2:regex}'} ? ${3:_} | ${4:VAL}]",
+    "description": "Conditional content: [cond ? contentIfTrue | contentIfFalse]"
+  }
+}

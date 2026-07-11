@@ -1,0 +1,47 @@
+# Разработка
+
+## Состав
+
+| Слой | Где | Сборка |
+|---|---|---|
+| Декларативный (грамматики, сниппеты) | `syntaxes/`, `snippets/`, `language-configuration.json` | не требуется |
+| TS-клиент | `client/src/extension.ts` | `npm run build:client` (esbuild → `dist/extension.js`) |
+| LSP-сервер `rtl-lsp` | `server/` (Rust, tower-lsp) | `cargo build --release` в `server/` |
+
+## Зависимость от pyregtab
+
+`rtl-lsp` использует чистое Rust-ядро pyregtab
+(`default-features = false` — без pyo3). Пока пререквизитная работа
+(cargo-фича `python`, `compile_permissive`, позиции ошибок) живёт в ветке
+`rtl-lsp-core` pyregtab и не выпущена релизом, зависимость — **path**
+на соседний checkout: `../../pyregtab` (ветка `rtl-lsp-core` должна быть
+выкачана). CI раскладывает репозитории так же (checkout pyregtab рядом).
+После релиза pyregtab с этой работой зависимость переключается на
+закреплённый git-тег (план §3.2).
+
+На Windows с тулчейном `x86_64-pc-windows-gnu`: если сборка падает с
+«error calling dlltool», проверьте, что `parking_lot_core` закреплён на
+0.9.9 в `server/Cargo.lock` (raw-dylib новых версий требует dlltool,
+которого нет в rust-mingw по умолчанию).
+
+## Тесты
+
+- `npm test` — типы клиента, снапшоты грамматики, sync-check с `RTL.g4`.
+- `cd server && cargo test` — юнит-тесты диагностики + conformance-корпус
+  (позитив: ноль диагностик; негатив: точные позиции; `ext_unbound_*`
+  обязаны компилироваться в пермиссивном режиме).
+- `npm run test:e2e` — смоук через `@vscode/test-electron`: расширение
+  активируется, сервер поднимается, битый `.rtl` даёт диагностику
+  (нужен собранный бинарь в `bin/`).
+
+## Сборка VSIX
+
+- Универсальный (только подсветка): `npx vsce package` при **пустом** `bin/`.
+- Платформенный: положить `rtl-lsp(.exe)` в `bin/`, затем
+  `npx vsce package --target win32-x64` (и т.д. — список таргетов в
+  `release.yml`).
+
+## Публикация
+
+Только вручную и только с явного одобрения владельца: push тега `v*`
+запускает `release.yml` (нужны секреты `VSCE_PAT`, `OVSX_PAT`).

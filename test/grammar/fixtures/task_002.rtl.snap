@@ -1,0 +1,67 @@
+>{ [ [VAL=NORM] [] ]{2}
+#^ source.rtl keyword.control.subtable.bracket.rtl
+# ^ source.rtl
+#  ^ source.rtl entity.name.function.row.bracket.rtl
+#   ^ source.rtl
+#    ^ source.rtl punctuation.section.cell.bracket.rtl
+#     ^^^ source.rtl storage.type.item.rtl
+#        ^ source.rtl keyword.operator.rtl
+#         ^^^^ source.rtl support.function.extractor.rtl
+#             ^ source.rtl punctuation.section.cell.bracket.rtl
+#              ^ source.rtl
+#               ^ source.rtl punctuation.section.cell.bracket.rtl
+#                ^ source.rtl punctuation.section.cell.bracket.rtl
+#                 ^ source.rtl
+#                  ^ source.rtl entity.name.function.row.bracket.rtl
+#                   ^^^ source.rtl keyword.operator.quantifier.rtl
+>  [ [!BLANK ? VAL : (SC{2}, SR)->REC(2)] [VAL] ]+
+#^^ source.rtl
+#  ^ source.rtl entity.name.function.row.bracket.rtl
+#   ^ source.rtl
+#    ^ source.rtl punctuation.section.cell.bracket.rtl
+#     ^ source.rtl keyword.operator.rtl
+#      ^^^^^ source.rtl constant.language.content.rtl
+#           ^ source.rtl
+#            ^ source.rtl keyword.operator.quantifier.rtl
+#             ^ source.rtl
+#              ^^^ source.rtl storage.type.item.rtl
+#                 ^ source.rtl
+#                  ^ source.rtl keyword.operator.rtl
+#                   ^ source.rtl
+#                    ^ source.rtl punctuation.section.bracket.rtl
+#                     ^^ source.rtl support.constant.provider.rtl
+#                       ^^^ source.rtl keyword.operator.quantifier.rtl
+#                          ^ source.rtl keyword.operator.rtl
+#                           ^ source.rtl
+#                            ^^ source.rtl support.constant.provider.rtl
+#                              ^ source.rtl punctuation.section.bracket.rtl
+#                               ^^ source.rtl keyword.operator.arrow.rtl
+#                                 ^^^ source.rtl keyword.control.action.rtl
+#                                    ^ source.rtl punctuation.section.bracket.rtl
+#                                     ^ source.rtl constant.numeric.rtl
+#                                      ^ source.rtl punctuation.section.bracket.rtl
+#                                       ^ source.rtl punctuation.section.cell.bracket.rtl
+#                                        ^ source.rtl
+#                                         ^ source.rtl punctuation.section.cell.bracket.rtl
+#                                          ^^^ source.rtl storage.type.item.rtl
+#                                             ^ source.rtl punctuation.section.cell.bracket.rtl
+#                                              ^ source.rtl
+#                                               ^ source.rtl entity.name.function.row.bracket.rtl
+#                                                ^ source.rtl keyword.operator.quantifier.rtl
+>  [ [BLANK] [] ]? }+
+#^^ source.rtl
+#  ^ source.rtl entity.name.function.row.bracket.rtl
+#   ^ source.rtl
+#    ^ source.rtl punctuation.section.cell.bracket.rtl
+#     ^^^^^ source.rtl constant.language.content.rtl
+#          ^ source.rtl punctuation.section.cell.bracket.rtl
+#           ^ source.rtl
+#            ^ source.rtl punctuation.section.cell.bracket.rtl
+#             ^ source.rtl punctuation.section.cell.bracket.rtl
+#              ^ source.rtl
+#               ^ source.rtl entity.name.function.row.bracket.rtl
+#                ^ source.rtl keyword.operator.quantifier.rtl
+#                 ^ source.rtl
+#                  ^ source.rtl keyword.control.subtable.bracket.rtl
+#                   ^ source.rtl keyword.operator.quantifier.rtl
+>

@@ -1,0 +1,9 @@
+node_modules/
+dist/
+out/
+bin/
+*.vsix
+.vscode-test/
+__pycache__/
+*.pyc
+server/target/

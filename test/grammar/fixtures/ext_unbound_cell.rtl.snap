@@ -1,0 +1,16 @@
+>[ [EXT('nope') ? VAL] ]
+#^ source.rtl entity.name.function.row.bracket.rtl
+# ^ source.rtl
+#  ^ source.rtl punctuation.section.cell.bracket.rtl
+#   ^^^ source.rtl constant.language.content.rtl
+#      ^ source.rtl punctuation.section.bracket.rtl
+#       ^^^^^^ source.rtl string.quoted.single.rtl
+#             ^ source.rtl punctuation.section.bracket.rtl
+#              ^ source.rtl
+#               ^ source.rtl keyword.operator.quantifier.rtl
+#                ^ source.rtl
+#                 ^^^ source.rtl storage.type.item.rtl
+#                    ^ source.rtl punctuation.section.cell.bracket.rtl
+#                     ^ source.rtl
+#                      ^ source.rtl entity.name.function.row.bracket.rtl
+>

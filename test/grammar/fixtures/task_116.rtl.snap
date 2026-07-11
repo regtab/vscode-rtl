@@ -1,0 +1,229 @@
+>$V1=[VAL: -AV->PREFIX(', ')]
+#^^^ source.rtl variable.other.fragment.rtl
+#   ^ source.rtl keyword.operator.rtl
+#    ^ source.rtl punctuation.section.cell.bracket.rtl
+#     ^^^ source.rtl storage.type.item.rtl
+#        ^ source.rtl keyword.operator.rtl
+#         ^^ source.rtl
+#           ^^ source.rtl support.constant.provider.rtl
+#             ^^ source.rtl keyword.operator.arrow.rtl
+#               ^^^^^^ source.rtl keyword.control.action.rtl
+#                     ^ source.rtl punctuation.section.bracket.rtl
+#                      ^^^^ source.rtl string.quoted.single.rtl
+#                          ^ source.rtl punctuation.section.bracket.rtl
+#                           ^ source.rtl punctuation.section.cell.bracket.rtl
+>$V2=[VAL: 'VALUE'->AVP, (ROW, COL&R1..3*, -AV&#'IND')->REC]
+#^^^ source.rtl variable.other.fragment.rtl
+#   ^ source.rtl keyword.operator.rtl
+#    ^ source.rtl punctuation.section.cell.bracket.rtl
+#     ^^^ source.rtl storage.type.item.rtl
+#        ^ source.rtl keyword.operator.rtl
+#         ^ source.rtl
+#          ^^^^^^^ source.rtl string.quoted.single.rtl
+#                 ^^ source.rtl keyword.operator.arrow.rtl
+#                   ^^^ source.rtl keyword.control.action.rtl
+#                      ^ source.rtl keyword.operator.rtl
+#                       ^ source.rtl
+#                        ^ source.rtl punctuation.section.bracket.rtl
+#                         ^^^ source.rtl support.constant.provider.rtl
+#                            ^ source.rtl keyword.operator.rtl
+#                             ^ source.rtl
+#                              ^^^ source.rtl support.constant.provider.rtl
+#                                 ^ source.rtl keyword.operator.rtl
+#                                  ^ source.rtl support.constant.positional.rtl
+#                                   ^ source.rtl constant.numeric.rtl
+#                                    ^^ source.rtl keyword.operator.range.rtl
+#                                      ^ source.rtl constant.numeric.rtl
+#                                       ^ source.rtl keyword.operator.quantifier.rtl
+#                                        ^ source.rtl keyword.operator.rtl
+#                                         ^^ source.rtl
+#                                           ^^ source.rtl support.constant.provider.rtl
+#                                             ^ source.rtl keyword.operator.rtl
+#                                              ^ source.rtl entity.name.tag.rtl
+#                                               ^^^^^ source.rtl string.quoted.single.rtl
+#                                                    ^ source.rtl punctuation.section.bracket.rtl
+#                                                     ^^ source.rtl keyword.operator.arrow.rtl
+#                                                       ^^^ source.rtl keyword.control.action.rtl
+#                                                          ^ source.rtl punctuation.section.cell.bracket.rtl
+>[ []+ ]
+#^ source.rtl entity.name.function.row.bracket.rtl
+# ^ source.rtl
+#  ^ source.rtl punctuation.section.cell.bracket.rtl
+#   ^ source.rtl punctuation.section.cell.bracket.rtl
+#    ^ source.rtl keyword.operator.quantifier.rtl
+#     ^ source.rtl
+#      ^ source.rtl entity.name.function.row.bracket.rtl
+>[ [] [VAL: 'TERRITORY'->AVP]+ ]
+#^ source.rtl entity.name.function.row.bracket.rtl
+# ^ source.rtl
+#  ^ source.rtl punctuation.section.cell.bracket.rtl
+#   ^ source.rtl punctuation.section.cell.bracket.rtl
+#    ^ source.rtl
+#     ^ source.rtl punctuation.section.cell.bracket.rtl
+#      ^^^ source.rtl storage.type.item.rtl
+#         ^ source.rtl keyword.operator.rtl
+#          ^ source.rtl
+#           ^^^^^^^^^^^ source.rtl string.quoted.single.rtl
+#                      ^^ source.rtl keyword.operator.arrow.rtl
+#                        ^^^ source.rtl keyword.control.action.rtl
+#                           ^ source.rtl punctuation.section.cell.bracket.rtl
+#                            ^ source.rtl keyword.operator.quantifier.rtl
+#                             ^ source.rtl
+#                              ^ source.rtl entity.name.function.row.bracket.rtl
+>[ [AUX]+ ]
+#^ source.rtl entity.name.function.row.bracket.rtl
+# ^ source.rtl
+#  ^ source.rtl punctuation.section.cell.bracket.rtl
+#   ^^^ source.rtl storage.type.item.rtl
+#      ^ source.rtl punctuation.section.cell.bracket.rtl
+#       ^ source.rtl keyword.operator.quantifier.rtl
+#        ^ source.rtl
+#         ^ source.rtl entity.name.function.row.bracket.rtl
+>[ 'LOCATION'->AVP [] [$V1]{4} [VAL] []
+#^ source.rtl entity.name.function.row.bracket.rtl
+# ^ source.rtl
+#  ^^^^^^^^^^ source.rtl string.quoted.single.rtl
+#            ^^ source.rtl keyword.operator.arrow.rtl
+#              ^^^ source.rtl keyword.control.action.rtl
+#                 ^ source.rtl
+#                  ^ source.rtl punctuation.section.cell.bracket.rtl
+#                   ^ source.rtl punctuation.section.cell.bracket.rtl
+#                    ^ source.rtl
+#                     ^ source.rtl punctuation.section.cell.bracket.rtl
+#                      ^^^ source.rtl variable.other.fragment.rtl
+#                         ^ source.rtl punctuation.section.cell.bracket.rtl
+#                          ^^^ source.rtl keyword.operator.quantifier.rtl
+#                             ^ source.rtl
+#                              ^ source.rtl punctuation.section.cell.bracket.rtl
+#                               ^^^ source.rtl storage.type.item.rtl
+#                                  ^ source.rtl punctuation.section.cell.bracket.rtl
+#                                   ^ source.rtl
+#                                    ^ source.rtl punctuation.section.cell.bracket.rtl
+#                                     ^ source.rtl punctuation.section.cell.bracket.rtl
+>                     [VAL] [$V1] [VAL]
+#^^^^^^^^^^^^^^^^^^^^^ source.rtl
+#                     ^ source.rtl punctuation.section.cell.bracket.rtl
+#                      ^^^ source.rtl storage.type.item.rtl
+#                         ^ source.rtl punctuation.section.cell.bracket.rtl
+#                          ^ source.rtl
+#                           ^ source.rtl punctuation.section.cell.bracket.rtl
+#                            ^^^ source.rtl variable.other.fragment.rtl
+#                               ^ source.rtl punctuation.section.cell.bracket.rtl
+#                                ^ source.rtl
+#                                 ^ source.rtl punctuation.section.cell.bracket.rtl
+#                                  ^^^ source.rtl storage.type.item.rtl
+#                                     ^ source.rtl punctuation.section.cell.bracket.rtl
+>                     [$V1] [VAL] []
+#^^^^^^^^^^^^^^^^^^^^^ source.rtl
+#                     ^ source.rtl punctuation.section.cell.bracket.rtl
+#                      ^^^ source.rtl variable.other.fragment.rtl
+#                         ^ source.rtl punctuation.section.cell.bracket.rtl
+#                          ^ source.rtl
+#                           ^ source.rtl punctuation.section.cell.bracket.rtl
+#                            ^^^ source.rtl storage.type.item.rtl
+#                               ^ source.rtl punctuation.section.cell.bracket.rtl
+#                                ^ source.rtl
+#                                 ^ source.rtl punctuation.section.cell.bracket.rtl
+#                                  ^ source.rtl punctuation.section.cell.bracket.rtl
+>                     { [VAL] [$V1] [VAL] [] }? ]
+#^^^^^^^^^^^^^^^^^^^^^ source.rtl
+#                     ^ source.rtl entity.name.type.subrow.bracket.rtl
+#                      ^ source.rtl
+#                       ^ source.rtl punctuation.section.cell.bracket.rtl
+#                        ^^^ source.rtl storage.type.item.rtl
+#                           ^ source.rtl punctuation.section.cell.bracket.rtl
+#                            ^ source.rtl
+#                             ^ source.rtl punctuation.section.cell.bracket.rtl
+#                              ^^^ source.rtl variable.other.fragment.rtl
+#                                 ^ source.rtl punctuation.section.cell.bracket.rtl
+#                                  ^ source.rtl
+#                                   ^ source.rtl punctuation.section.cell.bracket.rtl
+#                                    ^^^ source.rtl storage.type.item.rtl
+#                                       ^ source.rtl punctuation.section.cell.bracket.rtl
+#                                        ^ source.rtl
+#                                         ^ source.rtl punctuation.section.cell.bracket.rtl
+#                                          ^ source.rtl punctuation.section.cell.bracket.rtl
+#                                           ^ source.rtl
+#                                            ^ source.rtl entity.name.type.subrow.bracket.rtl
+#                                             ^ source.rtl keyword.operator.quantifier.rtl
+#                                              ^ source.rtl
+#                                               ^ source.rtl entity.name.function.row.bracket.rtl
+>{ [ [VAL#'IND': 'INDICATOR'->AVP ',' VAL: 'UNIT'->AVP]+ ]
+#^ source.rtl keyword.control.subtable.bracket.rtl
+# ^ source.rtl
+#  ^ source.rtl entity.name.function.row.bracket.rtl
+#   ^ source.rtl
+#    ^ source.rtl punctuation.section.cell.bracket.rtl
+#     ^^^ source.rtl storage.type.item.rtl
+#        ^ source.rtl entity.name.tag.rtl
+#         ^^^^^ source.rtl string.quoted.single.rtl
+#              ^ source.rtl keyword.operator.rtl
+#               ^ source.rtl
+#                ^^^^^^^^^^^ source.rtl string.quoted.single.rtl
+#                           ^^ source.rtl keyword.operator.arrow.rtl
+#                             ^^^ source.rtl keyword.control.action.rtl
+#                                ^ source.rtl
+#                                 ^^^ source.rtl string.quoted.single.rtl
+#                                    ^ source.rtl
+#                                     ^^^ source.rtl storage.type.item.rtl
+#                                        ^ source.rtl keyword.operator.rtl
+#                                         ^ source.rtl
+#                                          ^^^^^^ source.rtl string.quoted.single.rtl
+#                                                ^^ source.rtl keyword.operator.arrow.rtl
+#                                                  ^^^ source.rtl keyword.control.action.rtl
+#                                                     ^ source.rtl punctuation.section.cell.bracket.rtl
+#                                                      ^ source.rtl keyword.operator.quantifier.rtl
+#                                                       ^ source.rtl
+#                                                        ^ source.rtl entity.name.function.row.bracket.rtl
+>  [ ['20\d\d' ? VAL: 'YEAR'->AVP]
+#^^ source.rtl
+#  ^ source.rtl entity.name.function.row.bracket.rtl
+#   ^ source.rtl
+#    ^ source.rtl punctuation.section.cell.bracket.rtl
+#     ^^^^^^^^ source.rtl string.quoted.single.rtl
+#             ^ source.rtl
+#              ^ source.rtl keyword.operator.quantifier.rtl
+#               ^ source.rtl
+#                ^^^ source.rtl storage.type.item.rtl
+#                   ^ source.rtl keyword.operator.rtl
+#                    ^ source.rtl
+#                     ^^^^^^ source.rtl string.quoted.single.rtl
+#                           ^^ source.rtl keyword.operator.arrow.rtl
+#                             ^^^ source.rtl keyword.control.action.rtl
+#                                ^ source.rtl punctuation.section.cell.bracket.rtl
+>    { [$V2]{5} [] }{2}
+#^^^^ source.rtl
+#    ^ source.rtl entity.name.type.subrow.bracket.rtl
+#     ^ source.rtl
+#      ^ source.rtl punctuation.section.cell.bracket.rtl
+#       ^^^ source.rtl variable.other.fragment.rtl
+#          ^ source.rtl punctuation.section.cell.bracket.rtl
+#           ^^^ source.rtl keyword.operator.quantifier.rtl
+#              ^ source.rtl
+#               ^ source.rtl punctuation.section.cell.bracket.rtl
+#                ^ source.rtl punctuation.section.cell.bracket.rtl
+#                 ^ source.rtl
+#                  ^ source.rtl entity.name.type.subrow.bracket.rtl
+#                   ^^^ source.rtl keyword.operator.quantifier.rtl
+>    { [$V2]{3} [] }?
+#^^^^ source.rtl
+#    ^ source.rtl entity.name.type.subrow.bracket.rtl
+#     ^ source.rtl
+#      ^ source.rtl punctuation.section.cell.bracket.rtl
+#       ^^^ source.rtl variable.other.fragment.rtl
+#          ^ source.rtl punctuation.section.cell.bracket.rtl
+#           ^^^ source.rtl keyword.operator.quantifier.rtl
+#              ^ source.rtl
+#               ^ source.rtl punctuation.section.cell.bracket.rtl
+#                ^ source.rtl punctuation.section.cell.bracket.rtl
+#                 ^ source.rtl
+#                  ^ source.rtl entity.name.type.subrow.bracket.rtl
+#                   ^ source.rtl keyword.operator.quantifier.rtl
+>  ]+
+#^^ source.rtl
+#  ^ source.rtl entity.name.function.row.bracket.rtl
+#   ^ source.rtl keyword.operator.quantifier.rtl
+>}+
+#^ source.rtl keyword.control.subtable.bracket.rtl
+# ^ source.rtl keyword.operator.quantifier.rtl
+>

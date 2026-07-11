@@ -1,0 +1,13 @@
+><FOO> [ [VAL] ]
+#^ source.rtl punctuation.section.bracket.rtl
+# ^^^ source.rtl
+#    ^ source.rtl punctuation.section.bracket.rtl
+#     ^ source.rtl
+#      ^ source.rtl entity.name.function.row.bracket.rtl
+#       ^ source.rtl
+#        ^ source.rtl punctuation.section.cell.bracket.rtl
+#         ^^^ source.rtl storage.type.item.rtl
+#            ^ source.rtl punctuation.section.cell.bracket.rtl
+#             ^ source.rtl
+#              ^ source.rtl entity.name.function.row.bracket.rtl
+>

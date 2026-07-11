@@ -1,0 +1,131 @@
+{
+  "name": "rtl",
+  "displayName": "RegTab RTL",
+  "description": "Regular Table Language (RTL) support — the table-pattern DSL of the RegTab project: syntax highlighting for .rtl files and for RTL embedded in Python and Java string literals, snippets, and editor configuration.",
+  "version": "0.2.0",
+  "publisher": "regtab",
+  "license": "MIT",
+  "icon": "icon.png",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/regtab/vscode-rtl.git"
+  },
+  "homepage": "https://github.com/regtab/vscode-rtl#readme",
+  "bugs": {
+    "url": "https://github.com/regtab/vscode-rtl/issues"
+  },
+  "engines": {
+    "vscode": "^1.75.0"
+  },
+  "categories": [
+    "Programming Languages",
+    "Snippets"
+  ],
+  "main": "./dist/extension.js",
+  "keywords": [
+    "Regular Table Language",
+    "RegTab",
+    "table extraction",
+    "data wrangling",
+    "DSL"
+  ],
+  "contributes": {
+    "languages": [
+      {
+        "id": "rtl",
+        "aliases": [
+          "RTL",
+          "Regular Table Language"
+        ],
+        "extensions": [
+          ".rtl"
+        ],
+        "configuration": "./language-configuration.json"
+      }
+    ],
+    "grammars": [
+      {
+        "language": "rtl",
+        "scopeName": "source.rtl",
+        "path": "./syntaxes/rtl.tmLanguage.json"
+      },
+      {
+        "scopeName": "inline.rtl-python",
+        "path": "./syntaxes/rtl-python-injection.tmLanguage.json",
+        "injectTo": [
+          "source.python"
+        ],
+        "embeddedLanguages": {
+          "meta.embedded.block.rtl": "rtl",
+          "meta.embedded.line.rtl": "rtl"
+        }
+      },
+      {
+        "scopeName": "inline.rtl-java",
+        "path": "./syntaxes/rtl-java-injection.tmLanguage.json",
+        "injectTo": [
+          "source.java"
+        ],
+        "embeddedLanguages": {
+          "meta.embedded.block.rtl": "rtl",
+          "meta.embedded.line.rtl": "rtl"
+        }
+      }
+    ],
+    "snippets": [
+      {
+        "language": "rtl",
+        "path": "./snippets/rtl.json"
+      }
+    ],
+    "configurationDefaults": {
+      "[rtl]": {
+        "editor.bracketPairColorization.enabled": false
+      }
+    },
+    "configuration": {
+      "title": "RTL",
+      "properties": {
+        "rtl.server.path": {
+          "type": "string",
+          "default": "",
+          "description": "Path to an rtl-lsp executable. Overrides the server bundled with the extension (useful on platforms without a bundled binary)."
+        },
+        "rtl.trace.server": {
+          "type": "string",
+          "enum": [
+            "off",
+            "messages",
+            "verbose"
+          ],
+          "default": "off",
+          "description": "Trace the communication between VS Code and the RTL language server."
+        }
+      }
+    }
+  },
+  "scripts": {
+    "test": "npm run check:types && npm run test:grammar && npm run check:sync",
+    "test:grammar": "vscode-tmgrammar-snap \"test/grammar/fixtures/*.rtl\"",
+    "test:grammar:update": "vscode-tmgrammar-snap --updateSnapshot \"test/grammar/fixtures/*.rtl\"",
+    "check:sync": "python tools/check_grammar_sync.py",
+    "check:types": "tsc -p client",
+    "test:e2e": "node test/e2e/runTests.js",
+    "build:client": "esbuild client/src/extension.ts --bundle --outfile=dist/extension.js --external:vscode --format=cjs --platform=node --target=node16 --minify",
+    "vscode:prepublish": "npm run build:client",
+    "package": "vsce package"
+  },
+  "dependencies": {
+    "vscode-languageclient": "^9.0.1"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.0",
+    "@types/vscode": "^1.75.0",
+    "@vscode/test-electron": "^2.5.2",
+    "@vscode/vsce": "^3.3.2",
+    "esbuild": "^0.25.0",
+    "mocha": "^11.7.6",
+    "typescript": "^5.4.0",
+    "vscode-tmgrammar-test": "^0.1.3"
+  }
+}

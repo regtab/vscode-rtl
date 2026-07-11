@@ -1,0 +1,62 @@
+>[ [] [VAL: 'AIRLINE'->AVP]+ ]
+#^ source.rtl entity.name.function.row.bracket.rtl
+# ^ source.rtl
+#  ^ source.rtl punctuation.section.cell.bracket.rtl
+#   ^ source.rtl punctuation.section.cell.bracket.rtl
+#    ^ source.rtl
+#     ^ source.rtl punctuation.section.cell.bracket.rtl
+#      ^^^ source.rtl storage.type.item.rtl
+#         ^ source.rtl keyword.operator.rtl
+#          ^ source.rtl
+#           ^^^^^^^^^ source.rtl string.quoted.single.rtl
+#                    ^^ source.rtl keyword.operator.arrow.rtl
+#                      ^^^ source.rtl keyword.control.action.rtl
+#                         ^ source.rtl punctuation.section.cell.bracket.rtl
+#                          ^ source.rtl keyword.operator.quantifier.rtl
+#                           ^ source.rtl
+#                            ^ source.rtl entity.name.function.row.bracket.rtl
+>[ [VAL: 'AIRPORT'->AVP] [VAL: (COL,ROW,CL)->REC, 'ND'->AVP ' ' VAL: 'MON'->AVP]+ ]+
+#^ source.rtl entity.name.function.row.bracket.rtl
+# ^ source.rtl
+#  ^ source.rtl punctuation.section.cell.bracket.rtl
+#   ^^^ source.rtl storage.type.item.rtl
+#      ^ source.rtl keyword.operator.rtl
+#       ^ source.rtl
+#        ^^^^^^^^^ source.rtl string.quoted.single.rtl
+#                 ^^ source.rtl keyword.operator.arrow.rtl
+#                   ^^^ source.rtl keyword.control.action.rtl
+#                      ^ source.rtl punctuation.section.cell.bracket.rtl
+#                       ^ source.rtl
+#                        ^ source.rtl punctuation.section.cell.bracket.rtl
+#                         ^^^ source.rtl storage.type.item.rtl
+#                            ^ source.rtl keyword.operator.rtl
+#                             ^ source.rtl
+#                              ^ source.rtl punctuation.section.bracket.rtl
+#                               ^^^ source.rtl support.constant.provider.rtl
+#                                  ^ source.rtl keyword.operator.rtl
+#                                   ^^^ source.rtl support.constant.provider.rtl
+#                                      ^ source.rtl keyword.operator.rtl
+#                                       ^^ source.rtl support.constant.provider.rtl
+#                                         ^ source.rtl punctuation.section.bracket.rtl
+#                                          ^^ source.rtl keyword.operator.arrow.rtl
+#                                            ^^^ source.rtl keyword.control.action.rtl
+#                                               ^ source.rtl keyword.operator.rtl
+#                                                ^ source.rtl
+#                                                 ^^^^ source.rtl string.quoted.single.rtl
+#                                                     ^^ source.rtl keyword.operator.arrow.rtl
+#                                                       ^^^ source.rtl keyword.control.action.rtl
+#                                                          ^ source.rtl
+#                                                           ^^^ source.rtl string.quoted.single.rtl
+#                                                              ^ source.rtl
+#                                                               ^^^ source.rtl storage.type.item.rtl
+#                                                                  ^ source.rtl keyword.operator.rtl
+#                                                                   ^ source.rtl
+#                                                                    ^^^^^ source.rtl string.quoted.single.rtl
+#                                                                         ^^ source.rtl keyword.operator.arrow.rtl
+#                                                                           ^^^ source.rtl keyword.control.action.rtl
+#                                                                              ^ source.rtl punctuation.section.cell.bracket.rtl
+#                                                                               ^ source.rtl keyword.operator.quantifier.rtl
+#                                                                                ^ source.rtl
+#                                                                                 ^ source.rtl entity.name.function.row.bracket.rtl
+#                                                                                  ^ source.rtl keyword.operator.quantifier.rtl
+>

@@ -1,0 +1,99 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  # Declarative layer + client: grammar snapshots, sync-check, types, bundle,
+  # universal VSIX (no server binary — the platform fallback path).
+  extension:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Client typecheck
+        run: npm run check:types
+
+      - name: Grammar snapshot tests
+        run: npm run test:grammar
+
+      - name: Grammar sync-check (RTL.g4 <-> tmLanguage)
+        run: python tools/check_grammar_sync.py
+        env:
+          JREGTAB_TOKEN: ${{ secrets.JREGTAB_TOKEN }}
+
+      - name: Package universal VSIX
+        run: npx vsce package -o regtab-rtl.vsix
+
+      - name: Check universal VSIX size (< 200 KB)
+        run: |
+          size=$(stat -c%s regtab-rtl.vsix)
+          echo "VSIX size: $size bytes"
+          test "$size" -lt 204800
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: regtab-rtl-vsix
+          path: regtab-rtl.vsix
+
+  # rtl-lsp: cargo tests over the conformance corpus, then the e2e smoke
+  # against a real VS Code with the freshly built server bundled in bin/.
+  # The pyregtab core is a sibling-checkout path dependency until its
+  # `rtl-lsp-core` branch ships in a release (then: pinned git tag).
+  server:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          path: vscode-rtl
+
+      - uses: actions/checkout@v4
+        with:
+          repository: regtab/pyregtab
+          ref: rtl-lsp-core
+          path: pyregtab
+          token: ${{ secrets.PYREGTAB_TOKEN || github.token }}
+
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          components: clippy
+
+      - name: Clippy (blocking)
+        working-directory: vscode-rtl/server
+        run: cargo clippy --all-targets -- -D warnings
+
+      - name: Server tests (conformance corpus)
+        working-directory: vscode-rtl/server
+        run: cargo test
+
+      - name: Build release server
+        working-directory: vscode-rtl/server
+        run: |
+          cargo build --release
+          mkdir -p ../bin
+          cp target/release/rtl-lsp ../bin/
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: E2E smoke (VS Code + diagnostics)
+        working-directory: vscode-rtl
+        run: |
+          npm ci
+          npm run build:client
+          xvfb-run -a node test/e2e/runTests.js

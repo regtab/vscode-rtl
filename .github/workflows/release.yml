@@ -1,0 +1,145 @@
+# Release (plan §6): on a v* tag — matrix-build rtl-lsp for 7 targets, package
+# one VSIX per target plus the universal fallback, publish to the VS Code
+# Marketplace and Open VSX, attach everything to a GitHub Release.
+#
+# Publishing happens only on an explicit tag push by a maintainer.
+# Secrets: VSCE_PAT (Azure DevOps, publisher `regtab`), OVSX_PAT (Eclipse),
+# optionally PYREGTAB_TOKEN (read access to pyregtab if it is private).
+name: Release
+
+on:
+  push:
+    tags: ["v*"]
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - vsce_target: win32-x64
+            os: windows-latest
+            rust_target: x86_64-pc-windows-msvc
+            exe: .exe
+          - vsce_target: win32-arm64
+            os: windows-latest
+            rust_target: aarch64-pc-windows-msvc
+            exe: .exe
+          - vsce_target: linux-x64
+            os: ubuntu-latest
+            rust_target: x86_64-unknown-linux-gnu
+            exe: ""
+          - vsce_target: linux-arm64
+            os: ubuntu-24.04-arm
+            rust_target: aarch64-unknown-linux-gnu
+            exe: ""
+          - vsce_target: alpine-x64
+            os: ubuntu-latest
+            rust_target: x86_64-unknown-linux-musl
+            exe: ""
+          - vsce_target: darwin-x64
+            os: macos-latest
+            rust_target: x86_64-apple-darwin
+            exe: ""
+          - vsce_target: darwin-arm64
+            os: macos-latest
+            rust_target: aarch64-apple-darwin
+            exe: ""
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          path: vscode-rtl
+
+      - uses: actions/checkout@v4
+        with:
+          repository: regtab/pyregtab
+          ref: rtl-lsp-core
+          path: pyregtab
+          token: ${{ secrets.PYREGTAB_TOKEN || github.token }}
+
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.rust_target }}
+
+      - name: musl tools
+        if: matrix.vsce_target == 'alpine-x64'
+        run: sudo apt-get update && sudo apt-get install -y musl-tools
+
+      - name: Build rtl-lsp
+        working-directory: vscode-rtl/server
+        run: cargo build --release --target ${{ matrix.rust_target }}
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Package platform VSIX
+        working-directory: vscode-rtl
+        shell: bash
+        run: |
+          npm ci
+          mkdir -p bin
+          cp "server/target/${{ matrix.rust_target }}/release/rtl-lsp${{ matrix.exe }}" bin/
+          npx vsce package --target ${{ matrix.vsce_target }} \
+            -o "regtab-rtl-${{ github.ref_name }}-${{ matrix.vsce_target }}.vsix"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: vsix-${{ matrix.vsce_target }}
+          path: vscode-rtl/*.vsix
+
+  build-universal:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - name: Package universal VSIX (no server binary)
+        run: |
+          npm ci
+          npx vsce package -o regtab-rtl-${{ github.ref_name }}-universal.vsix
+      - uses: actions/upload-artifact@v4
+        with:
+          name: vsix-universal
+          path: "*.vsix"
+
+  publish:
+    needs: [build, build-universal]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: vsix-*
+          merge-multiple: true
+          path: vsix
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Publish to VS Code Marketplace
+        env:
+          VSCE_PAT: ${{ secrets.VSCE_PAT }}
+        run: |
+          for f in vsix/*.vsix; do
+            npx @vscode/vsce publish --packagePath "$f"
+          done
+
+      - name: Publish to Open VSX
+        env:
+          OVSX_PAT: ${{ secrets.OVSX_PAT }}
+        run: |
+          for f in vsix/*.vsix; do
+            npx ovsx publish "$f"
+          done
+
+      - name: GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: vsix/*.vsix
+          generate_release_notes: true

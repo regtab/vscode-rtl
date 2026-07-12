@@ -31,12 +31,22 @@ pub struct MatchFixtureResult {
     pub error: Option<String>,
 }
 
+/// One cell-derived item (plan §5.4 p. 2, refined 2026-07-12): a single cell
+/// may hold several items with different roles (compound/delimited content).
 #[derive(Debug, Serialize)]
 pub struct CellRole {
     pub row: usize,
     pub col: usize,
     /// "value" | "attribute" | "auxiliary"
     pub role: &'static str,
+    /// Ordinal of the item within its cell.
+    pub index: usize,
+    /// The extracted string (after extractors — may differ from the segment).
+    pub s: String,
+    /// Range of the item's source segment within the raw cell text,
+    /// in Unicode scalar values (code points), end-exclusive.
+    pub span: (usize, usize),
+    pub tags: Vec<String>,
 }
 
 pub fn read_csv(path: &str) -> Result<Vec<Vec<String>>, String> {
@@ -117,6 +127,10 @@ fn run(pattern: &str, grid: &[Vec<String>]) -> Result<MatchFixtureResult, String
                 ItemType::Attribute => "attribute",
                 ItemType::Auxiliary => "auxiliary",
             },
+            index: it.index,
+            s: it.s.clone(),
+            span: byte_span_to_chars(&grid[it.row][it.col], it.span),
+            tags: it.tags.clone(),
         })
         .collect();
 
@@ -142,6 +156,22 @@ fn err_text(e: &pyregtab::util::CoreErr) -> String {
     }
 }
 
+/// Convert a byte span within `text` to Unicode-scalar (code point) indices
+/// so the webview can slice the string safely.
+fn byte_span_to_chars(text: &str, span: (usize, usize)) -> (usize, usize) {
+    let mut from = 0;
+    let mut to = 0;
+    for (chars, (b, _)) in text.char_indices().enumerate() {
+        if b < span.0 {
+            from = chars + 1;
+        }
+        if b < span.1 {
+            to = chars + 1;
+        }
+    }
+    (from, to)
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -165,6 +195,31 @@ mod tests {
         // Header cells are attributes, data cells are values.
         assert!(res.cells.iter().any(|c| c.role == "attribute" && c.row == 0));
         assert!(res.cells.iter().any(|c| c.role == "value" && c.row > 0));
+    }
+
+    #[test]
+    fn compound_cell_yields_per_item_spans() {
+        let grid = vec![vec!["0 Jan".into()]];
+        let res = run("[ [VAL: 'ND'->AVP ' ' VAL: 'MON'->AVP] ]", &grid).unwrap();
+        assert!(res.matched);
+        let mut items: Vec<(&str, (usize, usize), usize)> = res
+            .cells
+            .iter()
+            .map(|c| (c.s.as_str(), c.span, c.index))
+            .collect();
+        items.sort_by_key(|i| i.2);
+        assert_eq!(items, vec![("0", (0, 1), 0), ("Jan", (2, 5), 1)]);
+    }
+
+    #[test]
+    fn spans_are_code_point_indices() {
+        // Cyrillic text: byte offsets differ from char offsets.
+        let grid = vec![vec!["юг Янв".into()]];
+        let res = run("[ [VAL ' ' VAL] ]", &grid).unwrap();
+        assert!(res.matched);
+        let spans: Vec<(usize, usize)> = res.cells.iter().map(|c| c.span).collect();
+        assert!(spans.contains(&(0, 2)), "{spans:?}"); // "юг"
+        assert!(spans.contains(&(3, 6)), "{spans:?}"); // "Янв"
     }
 
     #[test]

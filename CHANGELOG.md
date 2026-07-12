@@ -5,6 +5,17 @@ The extension follows [semver](https://semver.org) independently of
 jRegTab/pyRegTab versions; the pinned normative grammar version is recorded
 in the README.
 
+## 0.4.1
+
+- Preview granularity refined from cells to **cell-derived items** (plan §5.4
+  as amended): one cell may hold several items with different roles —
+  compound `[VAL ' ' VAL]`, delimited `(VAL){','}`, mixed `[ATTR ":" VAL]`.
+  The webview now highlights each item's source segment inside the raw cell
+  text with its role color (delimiters and unmatched text stay dimmed), and
+  the segment tooltip shows the item's role, tags and extracted string —
+  useful when `REPL`/`SUBSTR`/`NORM` rewrite it. Powered by the new `span`
+  field of `CellDerivedItem` in the pyRegTab core.
+
 ## 0.4.0
 
 - **Live match preview**: run the current `.rtl` pattern against a CSV

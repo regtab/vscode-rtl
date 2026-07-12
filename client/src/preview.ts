@@ -6,6 +6,13 @@ interface CellRole {
   row: number;
   col: number;
   role: "value" | "attribute" | "auxiliary";
+  /** Ordinal of the item within its cell. */
+  index: number;
+  /** Extracted string (after extractors — may differ from the segment). */
+  s: string;
+  /** Source segment range in the raw cell text, in code points. */
+  span: [number, number];
+  tags: string[];
 }
 
 interface MatchFixtureResult {
@@ -81,21 +88,50 @@ function esc(s: string): string {
   return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 }
 
+/** Raw cell text with each item's source segment wrapped in a colored span
+ * (plan §5.4 p. 3: granularity is the cell-derived item, not the cell). */
+function renderCell(text: string, items: CellRole[]): string {
+  if (items.length === 0) {
+    return `<td class="unmatched">${esc(text) || "&nbsp;"}</td>`;
+  }
+  const chars = [...text]; // code points, matching the server's span units
+  const sorted = [...items].sort((a, b) => a.span[0] - b.span[0]);
+  let html = "";
+  let pos = 0;
+  for (const it of sorted) {
+    let [from, to] = it.span;
+    from = Math.max(from, pos);
+    to = Math.min(to, chars.length);
+    if (to <= from) {
+      continue; // overlap or out of range — already covered
+    }
+    if (from > pos) {
+      html += `<span class="filler">${esc(chars.slice(pos, from).join(""))}</span>`;
+    }
+    const tags = it.tags.length ? ` #'${it.tags.join("' #'")}'` : "";
+    const tip = `${it.role.toUpperCase()}[${it.index}]${tags} → "${it.s}"`;
+    html += `<span class="${it.role}" title="${esc(tip)}">${
+      esc(chars.slice(from, to).join("")) || "&nbsp;"
+    }</span>`;
+    pos = to;
+  }
+  if (pos < chars.length) {
+    html += `<span class="filler">${esc(chars.slice(pos).join(""))}</span>`;
+  }
+  return `<td>${html || "&nbsp;"}</td>`;
+}
+
 function render(r: MatchFixtureResult, fixtureName: string): string {
-  const roleOf = new Map<string, string>();
+  const itemsOf = new Map<string, CellRole[]>();
   for (const c of r.cells) {
-    roleOf.set(`${c.row},${c.col}`, c.role);
+    const key = `${c.row},${c.col}`;
+    (itemsOf.get(key) ?? itemsOf.set(key, []).get(key)!).push(c);
   }
   const tableRows = r.table
     .map(
       (row, i) =>
         "<tr>" +
-        row
-          .map((cell, j) => {
-            const role = roleOf.get(`${i},${j}`) ?? "unmatched";
-            return `<td class="${role}">${esc(cell) || "&nbsp;"}</td>`;
-          })
-          .join("") +
+        row.map((cell, j) => renderCell(cell, itemsOf.get(`${i},${j}`) ?? [])).join("") +
         "</tr>"
     )
     .join("\n");
@@ -121,10 +157,10 @@ function render(r: MatchFixtureResult, fixtureName: string): string {
   h3 { margin: 0.6em 0 0.3em; }
   table { border-collapse: collapse; margin: 0.3em 0 1em; }
   td, th { border: 1px solid var(--vscode-editorWidget-border, #666); padding: 2px 8px; font-size: 0.95em; }
-  .value { background: rgba(64, 160, 64, 0.35); }
-  .attribute { background: rgba(64, 128, 224, 0.35); }
-  .auxiliary { background: rgba(224, 160, 32, 0.35); }
-  .unmatched { opacity: 0.6; }
+  .value { background: rgba(64, 160, 64, 0.35); border-radius: 2px; }
+  .attribute { background: rgba(64, 128, 224, 0.35); border-radius: 2px; }
+  .auxiliary { background: rgba(224, 160, 32, 0.35); border-radius: 2px; }
+  .unmatched, .filler { opacity: 0.6; }
   .banner { padding: 4px 8px; margin: 4px 0; border-radius: 3px; }
   .ok { background: rgba(64, 160, 64, 0.2); }
   .warn { background: rgba(224, 160, 32, 0.2); }

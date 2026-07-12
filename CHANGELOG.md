@@ -5,6 +5,22 @@ The extension follows [semver](https://semver.org) independently of
 jRegTab/pyRegTab versions; the pinned normative grammar version is recorded
 in the README.
 
+## 0.4.0
+
+- **Live match preview**: run the current `.rtl` pattern against a CSV
+  fixture — a side panel shows the table with matched cells colored by role
+  (VAL / ATTR / AUX / unmatched) and the extracted recordset, re-running on
+  every edit (debounced). Implemented as the `rtl/matchFixture` custom
+  request in `rtl-lsp` (CSV → TableSyntax → matcher → interpreter).
+- Fixture association, from specific to generic: a `// fixture: path`
+  directive in the pattern, the **RTL: Select Fixture…** command (remembered
+  per file), and the `rtl.fixtures.input` workspace setting — a template
+  with `${basename}`/`${dir}`/`${workspaceFolder}` variables and a trailing
+  `*` glob, or an array of `{pattern, input}` rules (first match wins), so a
+  directory of standalone patterns works without editing each file.
+- CodeLens on the first line: **▶ Preview with <fixture>** / **Select
+  fixture…**.
+
 ## 0.3.0
 
 - Hover reference for every RTL keyword — spatial/positional/content

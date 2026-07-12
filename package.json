@@ -2,7 +2,7 @@
   "name": "rtl",
   "displayName": "RegTab RTL",
   "description": "Regular Table Language (RTL) support — the table-pattern DSL of the RegTab project: syntax highlighting for .rtl files and for RTL embedded in Python and Java string literals, snippets, and editor configuration.",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "publisher": "regtab",
   "license": "MIT",
   "icon": "icon.png",
@@ -78,6 +78,16 @@
         "path": "./snippets/rtl.json"
       }
     ],
+    "commands": [
+      {
+        "command": "rtl.previewMatch",
+        "title": "RTL: Preview Match on Fixture"
+      },
+      {
+        "command": "rtl.selectFixture",
+        "title": "RTL: Select Fixture…"
+      }
+    ],
     "configurationDefaults": {
       "[rtl]": {
         "editor.bracketPairColorization.enabled": false
@@ -86,6 +96,25 @@
     "configuration": {
       "title": "RTL",
       "properties": {
+        "rtl.fixtures.input": {
+          "markdownDescription": "Template(s) that locate the input CSV table(s) for a `.rtl` pattern. Variables: `${basename}` (pattern file name without extension), `${dir}` (its directory), `${workspaceFolder}`. A trailing `*` glob segment is expanded. Either a single template string, or an array of `{pattern, input}` rules where `pattern` is a glob matched against the pattern file path (first match wins). Examples: `${dir}/${basename}.csv`; `[{\"pattern\": \"solutions/regtab/*.rtl\", \"input\": \"${workspaceFolder}/fixtures/${basename}/input_*.csv\"}]`.",
+          "type": [
+            "string",
+            "array"
+          ],
+          "default": "",
+          "items": {
+            "type": "object",
+            "properties": {
+              "pattern": {
+                "type": "string"
+              },
+              "input": {
+                "type": "string"
+              }
+            }
+          }
+        },
         "rtl.server.path": {
           "type": "string",
           "default": "",

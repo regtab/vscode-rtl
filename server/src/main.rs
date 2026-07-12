@@ -6,6 +6,7 @@
 
 mod analysis;
 mod hover_data;
+mod preview;
 
 use std::collections::HashMap;
 use std::sync::atomic::{AtomicU64, Ordering};
@@ -563,9 +564,33 @@ fn document_symbols(text: &str) -> Vec<DocumentSymbol> {
     out
 }
 
+impl Backend {
+    /// Custom request `rtl/matchFixture` (plan §5, phase 4).
+    async fn match_fixture(
+        &self,
+        params: preview::MatchFixtureParams,
+    ) -> Result<preview::MatchFixtureResult> {
+        let uri = Url::parse(&params.pattern_uri)
+            .map_err(|e| tower_lsp::jsonrpc::Error::invalid_params(e.to_string()))?;
+        let text = match self.doc_text(&uri).await {
+            Some(t) => t,
+            None => uri
+                .to_file_path()
+                .ok()
+                .and_then(|p| std::fs::read_to_string(p).ok())
+                .ok_or_else(|| {
+                    tower_lsp::jsonrpc::Error::invalid_params("unknown pattern document")
+                })?,
+        };
+        Ok(preview::match_fixture(&text, &params.fixture_path))
+    }
+}
+
 #[tokio::main]
 async fn main() {
-    let (service, socket) = LspService::new(Backend::new);
+    let (service, socket) = LspService::build(Backend::new)
+        .custom_method("rtl/matchFixture", Backend::match_fixture)
+        .finish();
     Server::new(tokio::io::stdin(), tokio::io::stdout(), socket)
         .serve(service)
         .await;

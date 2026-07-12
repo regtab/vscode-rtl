@@ -15,6 +15,11 @@ use serde::{Deserialize, Serialize};
 pub struct MatchFixtureParams {
     pub pattern_uri: String,
     pub fixture_path: String,
+    /// RTL source extracted by the client (e.g. from a host-language string
+    /// literal, plan §5 phase 5 step 0). When present, it wins over reading
+    /// the document at `pattern_uri`.
+    #[serde(default)]
+    pub pattern_text: Option<String>,
 }
 
 #[derive(Debug, Serialize, Default)]

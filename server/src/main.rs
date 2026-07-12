@@ -570,17 +570,22 @@ impl Backend {
         &self,
         params: preview::MatchFixtureParams,
     ) -> Result<preview::MatchFixtureResult> {
-        let uri = Url::parse(&params.pattern_uri)
-            .map_err(|e| tower_lsp::jsonrpc::Error::invalid_params(e.to_string()))?;
-        let text = match self.doc_text(&uri).await {
+        let text = match params.pattern_text {
             Some(t) => t,
-            None => uri
-                .to_file_path()
-                .ok()
-                .and_then(|p| std::fs::read_to_string(p).ok())
-                .ok_or_else(|| {
-                    tower_lsp::jsonrpc::Error::invalid_params("unknown pattern document")
-                })?,
+            None => {
+                let uri = Url::parse(&params.pattern_uri)
+                    .map_err(|e| tower_lsp::jsonrpc::Error::invalid_params(e.to_string()))?;
+                match self.doc_text(&uri).await {
+                    Some(t) => t,
+                    None => uri
+                        .to_file_path()
+                        .ok()
+                        .and_then(|p| std::fs::read_to_string(p).ok())
+                        .ok_or_else(|| {
+                            tower_lsp::jsonrpc::Error::invalid_params("unknown pattern document")
+                        })?,
+                }
+            }
         };
         Ok(preview::match_fixture(&text, &params.fixture_path))
     }

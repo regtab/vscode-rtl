@@ -25,11 +25,14 @@ runtime at all.
   (they bind to the host runtime only at run time). Platform-specific builds
   bundle the server; on other platforms point `rtl.server.path` at your own
   binary, or use the extension with highlighting only.
-- **Live match preview** — run the pattern against a CSV fixture: matched
-  cells are colored by role (VAL / ATTR / AUX), the extracted recordset is
-  shown alongside, and the preview re-runs as you edit. Fixtures bind via a
-  `// fixture:` directive, the *RTL: Select Fixture…* command, or the
-  `rtl.fixtures.input` glob template for whole directories of patterns.
+- **Live match preview** — run the pattern against a CSV fixture: each
+  matched cell-derived item's segment is colored by role (VAL / ATTR / AUX)
+  inside the cell text, the extracted recordset is shown alongside, and the
+  preview re-runs as you edit. Fixtures bind via a `// fixture:` directive,
+  the *RTL: Select Fixture…* command, or the `rtl.fixtures.input` glob
+  template for whole directories of patterns. Works on `.rtl` files **and on
+  RTL string literals in Python/Java** (`RtlCompiler.compile`, `@RtlSource`,
+  `language=RTL` markers) via a CodeLens on each literal.
 - **Hover reference** on every RTL keyword — constraint semantics, action
   effects, extractor behavior — generated from the normative RTL reference.
 - **Context-aware completion** — actions after `->`, extractors after `=`,
@@ -83,7 +86,8 @@ var atp = RtlCompiler.compile("[ [VAL: 'LABEL'->AVP] ]+");
 - Preview: diff the extracted recordset against an expected CSV
   (`rtl.fixtures.expected`), Excel fixtures, a Test Explorer over
   pattern × fixture pairs.
-- Diagnostics for RTL embedded in Python/Java string literals.
+- Diagnostics for RTL embedded in Python/Java string literals (the preview
+  already works there).
 
 ## Grammar version
 

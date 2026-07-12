@@ -5,6 +5,22 @@ The extension follows [semver](https://semver.org) independently of
 jRegTab/pyRegTab versions; the pinned normative grammar version is recorded
 in the README.
 
+## 0.5.0
+
+- **Preview from host-language string literals** (plan phase 5, step 0): the
+  match preview now also works on RTL embedded in Python and Java sources —
+  `RtlCompiler.compile("…")` (plain/raw/triple-quoted strings),
+  `@RtlSource("…")`, Java text blocks and `/* language=RTL */` markers get a
+  **▶ Preview RTL…** CodeLens; the commands also work from the cursor
+  position. Java text blocks are stripped of incidental indentation; common
+  escape sequences are decoded (raw strings taken verbatim). Fixture binding
+  works as for `.rtl` files — a `// fixture:` directive inside the literal,
+  a remembered per-literal choice, or `rtl.fixtures.input` (now matched
+  against the host file, `${basename}` = host file name).
+- Known limitations (same as the highlighting injections): the opening quote
+  must be on the same line as the trigger; string concatenation and f-strings
+  are not recognized.
+
 ## 0.4.1
 
 - Preview granularity refined from cells to **cell-derived items** (plan §5.4

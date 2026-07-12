@@ -1,6 +1,7 @@
 import * as path from "path";
 import * as vscode from "vscode";
 import { LanguageClient } from "vscode-languageclient/node";
+import { findRtlLiterals } from "./literals";
 
 interface CellRole {
   row: number;
@@ -24,10 +25,18 @@ interface MatchFixtureResult {
   error?: string;
 }
 
-/** One live preview panel per pattern document. */
+interface Target {
+  uri: vscode.Uri;
+  fixture: string;
+  /** Ordinal of the RTL string literal in a host (Python/Java) document;
+   * undefined for plain `.rtl` documents (plan §5, phase 5 step 0). */
+  litIndex?: number;
+}
+
+/** One live preview panel per pattern (a `.rtl` document or one literal). */
 export class PreviewManager {
   private panels = new Map<string, vscode.WebviewPanel>();
-  private fixtures = new Map<string, string>();
+  private targets = new Map<string, Target>();
   private timer: NodeJS.Timeout | undefined;
 
   constructor(
@@ -36,50 +45,86 @@ export class PreviewManager {
   ) {
     context.subscriptions.push(
       vscode.workspace.onDidChangeTextDocument((e) => {
-        if (e.document.languageId === "rtl" && this.panels.has(e.document.uri.toString())) {
+        const prefix = e.document.uri.toString();
+        const stale = [...this.targets.keys()].filter(
+          (k) => k === prefix || k.startsWith(`${prefix}#`)
+        );
+        if (stale.length) {
           clearTimeout(this.timer);
-          this.timer = setTimeout(() => void this.refresh(e.document.uri), 300);
+          this.timer = setTimeout(() => {
+            for (const key of stale) {
+              void this.refresh(key);
+            }
+          }, 300);
         }
       })
     );
   }
 
-  async open(patternUri: vscode.Uri, fixturePath: string): Promise<void> {
-    this.fixtures.set(patternUri.toString(), fixturePath);
-    const key = patternUri.toString();
+  static key(uri: vscode.Uri, litIndex?: number): string {
+    return litIndex === undefined ? uri.toString() : `${uri.toString()}#lit${litIndex}`;
+  }
+
+  async open(target: Target): Promise<void> {
+    const key = PreviewManager.key(target.uri, target.litIndex);
+    this.targets.set(key, target);
     if (!this.panels.has(key)) {
+      const name =
+        path.basename(target.uri.fsPath) +
+        (target.litIndex === undefined ? "" : ` · literal ${target.litIndex + 1}`);
       const panel = vscode.window.createWebviewPanel(
         "rtlPreview",
-        `RTL Preview: ${path.basename(patternUri.fsPath)}`,
+        `RTL Preview: ${name}`,
         vscode.ViewColumn.Beside,
         { enableScripts: false }
       );
-      panel.onDidDispose(() => this.panels.delete(key));
+      panel.onDidDispose(() => {
+        this.panels.delete(key);
+        this.targets.delete(key);
+      });
       this.panels.set(key, panel);
     }
-    await this.refresh(patternUri);
+    await this.refresh(key);
     this.panels.get(key)?.reveal(vscode.ViewColumn.Beside, true);
   }
 
-  private async refresh(patternUri: vscode.Uri): Promise<void> {
-    const key = patternUri.toString();
+  private async refresh(key: string): Promise<void> {
     const panel = this.panels.get(key);
-    const fixture = this.fixtures.get(key);
+    const target = this.targets.get(key);
     const client = this.client();
-    if (!panel || !fixture || !client) {
+    if (!panel || !target || !client) {
       return;
+    }
+    const fail = (message: string) => {
+      panel.webview.html = render(
+        { table: [], cells: [], schema: [], records: [], matched: false, error: message },
+        path.basename(target.fixture)
+      );
+    };
+    let patternText: string | undefined;
+    if (target.litIndex !== undefined) {
+      try {
+        const doc = await vscode.workspace.openTextDocument(target.uri);
+        const lit = findRtlLiterals(doc.getText(), doc.languageId)[target.litIndex];
+        if (!lit) {
+          fail(`RTL literal #${target.litIndex + 1} no longer found in the document.`);
+          return;
+        }
+        patternText = lit.text;
+      } catch (e) {
+        fail(String(e));
+        return;
+      }
     }
     try {
       const result = await client.sendRequest<MatchFixtureResult>("rtl/matchFixture", {
-        patternUri: key,
-        fixturePath: fixture,
+        patternUri: target.uri.toString(),
+        fixturePath: target.fixture,
+        patternText,
       });
-      panel.webview.html = render(result, path.basename(fixture));
+      panel.webview.html = render(result, path.basename(target.fixture));
     } catch (e) {
-      panel.webview.html = render(
-        { table: [], cells: [], schema: [], records: [], matched: false, error: String(e) },
-        path.basename(fixture)
-      );
+      fail(String(e));
     }
   }
 }

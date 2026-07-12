@@ -8,15 +8,20 @@ interface FixtureRule {
   input: string;
 }
 
-export function memoKey(uri: vscode.Uri): string {
-  return `rtl.fixture:${uri.toString()}`;
+export function memoKey(uri: vscode.Uri, litIndex?: number): string {
+  const suffix = litIndex === undefined ? "" : `#lit${litIndex}`;
+  return `rtl.fixture:${uri.toString()}${suffix}`;
 }
 
-/** Fixture candidates for a pattern document, most specific source first:
- * remembered choice → `// fixture:` directives → `rtl.fixtures.input`. */
+/** Fixture candidates for a pattern, most specific source first: remembered
+ * choice → `// fixture:` directives → `rtl.fixtures.input`. For a pattern
+ * embedded in a host-language literal, pass the extracted RTL text and the
+ * literal's ordinal — directives are read from the literal itself, and the
+ * remembered choice is per-literal. */
 export function fixtureCandidates(
   doc: vscode.TextDocument,
-  memo: vscode.Memento
+  memo: vscode.Memento,
+  literal?: { text: string; index: number }
 ): string[] {
   const out: string[] = [];
   const push = (p: string) => {
@@ -25,14 +30,16 @@ export function fixtureCandidates(
     }
   };
 
-  const remembered = memo.get<string>(memoKey(doc.uri));
+  const remembered = memo.get<string>(memoKey(doc.uri, literal?.index));
   if (remembered) {
     push(remembered);
   }
 
   const dir = path.dirname(doc.uri.fsPath);
-  const head = doc.getText(new vscode.Range(0, 0, Math.min(doc.lineCount, 20), 0));
-  for (const m of head.matchAll(/^\s*\/\/\s*fixture:\s*(.+?)\s*$/gm)) {
+  const rtlText =
+    literal?.text ??
+    doc.getText(new vscode.Range(0, 0, Math.min(doc.lineCount, 20), 0));
+  for (const m of rtlText.matchAll(/^\s*\/\/\s*fixture:\s*(.+?)\s*$/gm)) {
     push(path.resolve(dir, m[1]));
   }
 
@@ -50,7 +57,7 @@ function settingsCandidates(doc: vscode.TextDocument): string[] {
     return [];
   }
   const rules: FixtureRule[] =
-    typeof raw === "string" ? [{ pattern: "**/*.rtl", input: raw }] : raw;
+    typeof raw === "string" ? [{ pattern: "**/*", input: raw }] : raw;
   const folder = vscode.workspace.getWorkspaceFolder(doc.uri);
   for (const rule of rules) {
     if (!rule?.input) {
@@ -77,7 +84,7 @@ function expandTemplate(
 ): string[] {
   const dir = path.dirname(doc.uri.fsPath);
   const substituted = template
-    .replace(/\$\{basename\}/g, path.basename(doc.uri.fsPath, ".rtl"))
+    .replace(/\$\{basename\}/g, path.basename(doc.uri.fsPath, path.extname(doc.uri.fsPath)))
     .replace(/\$\{dir\}/g, dir)
     .replace(/\$\{workspaceFolder\}/g, folder ? folder.uri.fsPath : dir);
   const abs = path.isAbsolute(substituted)

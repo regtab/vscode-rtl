@@ -5,6 +5,15 @@ The extension follows [semver](https://semver.org) independently of
 jRegTab/pyRegTab versions; the pinned normative grammar version is recorded
 in the README.
 
+## 0.5.1
+
+- Fix: the **▶ Preview RTL…** CodeLens now appears on Python and Java files
+  without needing an `.rtl` file open first — the extension activates on
+  those languages (`onLanguage:python`, `onLanguage:java`). The rtl-lsp
+  server is still started lazily (on the first `.rtl` document or the first
+  preview request), so opening a Python/Java file that has no RTL never
+  spawns it.
+
 ## 0.5.0
 
 - **Preview from host-language string literals** (plan phase 5, step 0): the

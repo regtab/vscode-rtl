@@ -11,49 +11,85 @@ import { findRtlLiterals, RtlLiteral } from "./literals";
 import { PreviewManager } from "./preview";
 
 let client: LanguageClient | undefined;
+let starting: Promise<LanguageClient | undefined> | undefined;
 
 export async function activate(context: vscode.ExtensionContext): Promise<void> {
-  registerPreview(context);
-  const serverPath = findServer(context);
-  if (!serverPath) {
-    // Fallback (plan §3.3): the declarative layer still works; hint in the
-    // status bar that compile diagnostics are unavailable on this platform.
-    const status = vscode.window.createStatusBarItem(
-      vscode.StatusBarAlignment.Right
-    );
-    status.text = "RTL: highlighting only";
-    status.tooltip =
-      "The rtl-lsp language server is not bundled for this platform and " +
-      '"rtl.server.path" is not set. Syntax highlighting and snippets work; ' +
-      "compile diagnostics are disabled.";
-    const show = () => {
-      const active =
-        vscode.window.activeTextEditor?.document.languageId === "rtl";
-      if (active) {
-        status.show();
-      } else {
-        status.hide();
-      }
-    };
-    context.subscriptions.push(
-      status,
-      vscode.window.onDidChangeActiveTextEditor(show)
-    );
-    show();
-    return;
-  }
+  // Cheap, always: register commands and CodeLens providers. The extension
+  // also activates on Python/Java (see activationEvents) so the preview lens
+  // shows on RTL string literals — but the server is started lazily below,
+  // never merely because a host-language file is open.
+  registerPreview(context, () => ensureServer(context));
 
-  const serverOptions: ServerOptions = { command: serverPath };
-  const clientOptions: LanguageClientOptions = {
-    documentSelector: [{ language: "rtl" }],
+  // Start the server when RTL is actually used: an open .rtl document (for
+  // diagnostics) now or later. Preview requests start it on demand too.
+  const startIfRtl = () => {
+    if (vscode.workspace.textDocuments.some((d) => d.languageId === "rtl")) {
+      void ensureServer(context);
+    }
   };
-  client = new LanguageClient(
-    "rtl",
-    "RTL Language Server",
-    serverOptions,
-    clientOptions
+  startIfRtl();
+  context.subscriptions.push(
+    vscode.workspace.onDidOpenTextDocument(startIfRtl)
   );
-  await client.start();
+}
+
+/** Start the rtl-lsp language client once (idempotent). Returns undefined and
+ * shows a status-bar hint when no server binary is available (plan §3.3). */
+function ensureServer(
+  context: vscode.ExtensionContext
+): Promise<LanguageClient | undefined> {
+  if (client) {
+    return Promise.resolve(client);
+  }
+  if (starting) {
+    return starting;
+  }
+  starting = (async () => {
+    const serverPath = findServer(context);
+    if (!serverPath) {
+      showFallbackStatus(context);
+      return undefined;
+    }
+    const serverOptions: ServerOptions = { command: serverPath };
+    const clientOptions: LanguageClientOptions = {
+      documentSelector: [{ language: "rtl" }],
+    };
+    const c = new LanguageClient(
+      "rtl",
+      "RTL Language Server",
+      serverOptions,
+      clientOptions
+    );
+    await c.start();
+    client = c;
+    return client;
+  })();
+  return starting;
+}
+
+function showFallbackStatus(context: vscode.ExtensionContext): void {
+  const status = vscode.window.createStatusBarItem(
+    vscode.StatusBarAlignment.Right
+  );
+  status.text = "RTL: highlighting only";
+  status.tooltip =
+    "The rtl-lsp language server is not bundled for this platform and " +
+    '"rtl.server.path" is not set. Syntax highlighting and snippets work; ' +
+    "diagnostics and match preview are disabled.";
+  const show = () => {
+    const active =
+      vscode.window.activeTextEditor?.document.languageId === "rtl";
+    if (active) {
+      status.show();
+    } else {
+      status.hide();
+    }
+  };
+  context.subscriptions.push(
+    status,
+    vscode.window.onDidChangeActiveTextEditor(show)
+  );
+  show();
 }
 
 export function deactivate(): Thenable<void> | undefined {
@@ -62,7 +98,10 @@ export function deactivate(): Thenable<void> | undefined {
 
 /** Live match preview (plan §5, phase 4; phase 5 step 0 adds host-language
  * string literals): commands + CodeLens. */
-function registerPreview(context: vscode.ExtensionContext): void {
+function registerPreview(
+  context: vscode.ExtensionContext,
+  ensureServer: () => Promise<LanguageClient | undefined>
+): void {
   const previews = new PreviewManager(() => client, context);
   const lensChanged = new vscode.EventEmitter<void>();
 
@@ -171,7 +210,7 @@ function registerPreview(context: vscode.ExtensionContext): void {
         if (!supported(doc)) {
           return;
         }
-        if (!client) {
+        if (!(await ensureServer())) {
           void vscode.window.showWarningMessage(
             "RTL preview needs the rtl-lsp server (not available on this platform; set rtl.server.path)."
           );

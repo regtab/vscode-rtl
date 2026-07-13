@@ -8,6 +8,7 @@ tools/**
 plans/**
 grammar/**
 node_modules/**
+dist/**
 CLAUDE.md
 .gitignore
 .vscodeignore

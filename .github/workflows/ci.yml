@@ -31,6 +31,9 @@ jobs:
       - name: Grammar snapshot tests
         run: npm run test:grammar
 
+      - name: Unit tests (literal extraction)
+        run: npm run test:unit
+
       - name: Grammar sync-check (RTL.g4 <-> tmLanguage)
         run: python tools/check_grammar_sync.py
         env:

@@ -134,9 +134,10 @@
     }
   },
   "scripts": {
-    "test": "npm run check:types && npm run test:grammar && npm run check:sync",
+    "test": "npm run check:types && npm run test:grammar && npm run test:unit && npm run check:sync",
     "test:grammar": "vscode-tmgrammar-snap \"test/grammar/fixtures/*.rtl\"",
     "test:grammar:update": "vscode-tmgrammar-snap --updateSnapshot \"test/grammar/fixtures/*.rtl\"",
+    "test:unit": "esbuild test/unit/literals.test.ts --bundle --outfile=dist/test/literals.test.cjs --platform=node --format=cjs --external:mocha && mocha dist/test/literals.test.cjs",
     "check:sync": "python tools/check_grammar_sync.py",
     "check:types": "tsc -p client",
     "test:e2e": "node test/e2e/runTests.js",

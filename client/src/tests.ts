@@ -214,8 +214,8 @@ async function folderPairs(
     const pairs = new Map<string, TestCase>(); // input path → case
 
     // Directives: the i-th `// expected:` pairs with the i-th `// fixture:`.
-    const fixDirectives = directivePaths(text, dir, "fixture");
-    const expDirectives = directivePaths(text, dir, "expected");
+    const fixDirectives = directivePaths(text, dir, "fixture", folder.uri.fsPath);
+    const expDirectives = directivePaths(text, dir, "expected", folder.uri.fsPath);
     fixDirectives.forEach((input, i) => {
       const expected =
         expDirectives.length === 1 ? expDirectives[0] : expDirectives[i];

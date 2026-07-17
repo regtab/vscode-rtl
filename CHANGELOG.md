@@ -5,6 +5,16 @@ The extension follows [semver](https://semver.org) independently of
 jRegTab/pyRegTab versions; the pinned normative grammar version is recorded
 in the README.
 
+## 0.8.1
+
+- `${workspaceFolder}` is now substituted in `// fixture:` and `// expected:`
+  directive paths (falling back to the file's directory outside a workspace).
+  Useful for RTL literals in host files nested deep away from their fixtures —
+  e.g. a Java test under `src/test/java/…` can write
+  `// fixture: ${workspaceFolder}/src/test/resources/tasks/task_001/input_1.csv`
+  instead of a `../../../../../…` chain. Applies everywhere directives are
+  read: `.rtl` files, Python/Java literals, and Test Explorer discovery.
+
 ## 0.8.0
 
 - **Diagnostics for RTL inside Python/Java string literals** (plan §5,

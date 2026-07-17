@@ -4,14 +4,20 @@ import * as path from "path";
 /** Pure fixture-binding helpers (no `vscode` import — unit-testable and
  * shared between the preview and the Test Explorer). */
 
-/** `// <kind>: path` directive values resolved against `dir`, in order. */
+/** `// <kind>: path` directive values resolved against `dir`, in order.
+ * `${workspaceFolder}` in a value substitutes to `workspaceFolder` (falling
+ * back to `dir` outside a workspace) — for host files nested deep away from
+ * their fixtures, where a relative path would be a `../../..` chain. */
 export function directivePaths(
   rtlText: string,
   dir: string,
-  kind: "fixture" | "expected"
+  kind: "fixture" | "expected",
+  workspaceFolder?: string
 ): string[] {
   const rx = new RegExp(String.raw`^\s*//\s*${kind}:\s*(.+?)\s*$`, "gm");
-  return [...rtlText.matchAll(rx)].map((m) => path.resolve(dir, m[1]));
+  return [...rtlText.matchAll(rx)].map((m) =>
+    path.resolve(dir, m[1].replace(/\$\{workspaceFolder\}/g, workspaceFolder ?? dir))
+  );
 }
 
 /** The expected file paired with `inputPath`: a single expected serves every

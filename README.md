@@ -30,9 +30,10 @@ runtime at all.
 - **Live match preview** — run the pattern against a CSV fixture: each
   matched cell-derived item's segment is colored by role (VAL / ATTR / AUX)
   inside the cell text, the extracted recordset is shown alongside, and the
-  preview re-runs as you edit. Fixtures bind via a `// fixture:` directive,
-  the *RTL: Select Fixture…* command, or the `rtl.fixtures.input` glob
-  template for whole directories of patterns. Works on `.rtl` files **and on
+  preview re-runs as you edit. Fixtures bind via a `// fixture:` directive
+  (paths resolve against the file's directory; `${workspaceFolder}` is
+  substituted), the *RTL: Select Fixture…* command, or the
+  `rtl.fixtures.input` glob template for whole directories of patterns. Works on `.rtl` files **and on
   RTL string literals in Python/Java** (`RtlCompiler.compile`, `@RtlSource`,
   `language=RTL` markers) via a CodeLens on each literal.
 - **Expected-result diff** — bind an expected CSV to a fixture (an

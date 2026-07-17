@@ -55,7 +55,8 @@ export function fixtureCandidates(
   }
 
   const dir = path.dirname(doc.uri.fsPath);
-  for (const p of directivePaths(directiveText(doc, literal), dir, "fixture")) {
+  const folder = vscode.workspace.getWorkspaceFolder(doc.uri)?.uri.fsPath;
+  for (const p of directivePaths(directiveText(doc, literal), dir, "fixture", folder)) {
     push(p);
   }
 
@@ -79,10 +80,11 @@ export function expectedFor(
   literal?: { text: string; index: number }
 ): ExpectedBinding | undefined {
   const dir = path.dirname(doc.uri.fsPath);
+  const folder = vscode.workspace.getWorkspaceFolder(doc.uri)?.uri.fsPath;
   const text = directiveText(doc, literal);
-  const expDirectives = directivePaths(text, dir, "expected");
+  const expDirectives = directivePaths(text, dir, "expected", folder);
   if (expDirectives.length > 0) {
-    const fixDirectives = directivePaths(text, dir, "fixture");
+    const fixDirectives = directivePaths(text, dir, "fixture", folder);
     const i = fixDirectives.indexOf(inputPath);
     const p =
       expDirectives.length === 1
@@ -99,7 +101,6 @@ export function expectedFor(
   if (!rule) {
     return undefined;
   }
-  const folder = vscode.workspace.getWorkspaceFolder(doc.uri)?.uri.fsPath;
   const expecteds = expandTemplate(rule.expected, doc.uri.fsPath, folder);
   const inputRule = firstMatch(inputRules(doc.uri), doc);
   const inputs = inputRule

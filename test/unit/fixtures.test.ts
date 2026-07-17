@@ -29,6 +29,21 @@ describe("directivePaths", () => {
     ]);
     assert.deepStrictEqual(directivePaths(text, dir, "expected"), []);
   });
+
+  it("substitutes ${workspaceFolder} when given", () => {
+    const ws = path.resolve("/proj");
+    const text = "// fixture: ${workspaceFolder}/data/in.csv";
+    assert.deepStrictEqual(directivePaths(text, dir, "fixture", ws), [
+      path.join(ws, "data", "in.csv"),
+    ]);
+  });
+
+  it("falls back to the pattern dir for ${workspaceFolder} outside a workspace", () => {
+    const text = "// fixture: ${workspaceFolder}/data/in.csv";
+    assert.deepStrictEqual(directivePaths(text, dir, "fixture"), [
+      path.join(dir, "data", "in.csv"),
+    ]);
+  });
 });
 
 describe("pairExpected", () => {

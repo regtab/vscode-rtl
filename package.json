@@ -2,7 +2,7 @@
   "name": "rtl",
   "displayName": "RegTab RTL",
   "description": "Regular Table Language (RTL) support — the table-pattern DSL of the RegTab project: syntax highlighting for .rtl files and for RTL embedded in Python and Java string literals, snippets, and editor configuration.",
-  "version": "0.8.0",
+  "version": "0.8.1",
   "publisher": "regtab",
   "license": "MIT",
   "icon": "icon.png",

@@ -2,7 +2,7 @@
   "name": "rtl",
   "displayName": "RegTab RTL",
   "description": "Regular Table Language (RTL) support — the table-pattern DSL of the RegTab project: syntax highlighting for .rtl files and for RTL embedded in Python and Java string literals, snippets, and editor configuration.",
-  "version": "0.5.1",
+  "version": "0.6.0",
   "publisher": "regtab",
   "license": "MIT",
   "icon": "icon.png",
@@ -90,6 +90,10 @@
       {
         "command": "rtl.selectFixture",
         "title": "RTL: Select Fixture…"
+      },
+      {
+        "command": "rtl.showCanonicalForm",
+        "title": "RTL: Show Canonical Form"
       }
     ],
     "configurationDefaults": {

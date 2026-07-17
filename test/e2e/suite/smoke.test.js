@@ -59,4 +59,28 @@ describe("RTL extension smoke", () => {
       20000
     );
   });
+
+  it("shows the canonical form in a read-only side view", async () => {
+    const doc = await vscode.workspace.openTextDocument(vscode.Uri.file(file));
+    const editor = await vscode.window.showTextDocument(doc);
+    await editor.edit((edit) =>
+      edit.replace(
+        new vscode.Range(0, 0, doc.lineCount, 0),
+        "// fixture: t.csv\n[ [VAL : ST*->REC] ]+\n"
+      )
+    );
+    await vscode.commands.executeCommand("rtl.showCanonicalForm");
+    const view = await waitFor(
+      () =>
+        vscode.window.visibleTextEditors.find(
+          (e) => e.document.uri.scheme === "rtl-canonical"
+        ),
+      20000
+    );
+    assert.strictEqual(view.document.languageId, "rtl");
+    const canon = view.document.getText();
+    assert.ok(canon.includes("REC"), canon);
+    // Canonicalization drops comments — that is why it is not a formatter.
+    assert.ok(!canon.includes("fixture"), canon);
+  });
 });

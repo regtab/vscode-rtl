@@ -185,6 +185,63 @@ function registerPreview(
   const supported = (doc: vscode.TextDocument | undefined): doc is vscode.TextDocument =>
     !!doc && ["rtl", "python", "java"].includes(doc.languageId);
 
+  // Canonical form (plan §5, phase 3 item 5): a read-only side view, not a
+  // formatter — canonicalization drops comments (including `// fixture:`)
+  // and the authored layout, so it must never touch the source document.
+  const canonical = new Map<string, string>();
+  const canonicalChanged = new vscode.EventEmitter<vscode.Uri>();
+
+  context.subscriptions.push(
+    vscode.workspace.registerTextDocumentContentProvider("rtl-canonical", {
+      onDidChange: canonicalChanged.event,
+      provideTextDocumentContent: (uri) => canonical.get(uri.toString()) ?? "",
+    }),
+    vscode.commands.registerCommand(
+      "rtl.showCanonicalForm",
+      async (args?: { litIndex?: number }) => {
+        const doc = vscode.window.activeTextEditor?.document;
+        if (!supported(doc)) {
+          return;
+        }
+        const c = await ensureServer();
+        if (!c) {
+          void vscode.window.showWarningMessage(
+            "The canonical form needs the rtl-lsp server (not available on this platform; set rtl.server.path)."
+          );
+          return;
+        }
+        const literal = await resolveLiteral(doc, args?.litIndex);
+        if (literal === null) {
+          return;
+        }
+        const res = await c.sendRequest<{ text?: string; error?: string }>(
+          "rtl/canonicalize",
+          { patternUri: doc.uri.toString(), patternText: literal?.text }
+        );
+        if (res.error !== undefined || res.text === undefined) {
+          void vscode.window.showErrorMessage(
+            `Cannot canonicalize: ${res.error ?? "no result"}`
+          );
+          return;
+        }
+        const base = path.basename(doc.uri.path).replace(/\.[^.]+$/, "");
+        const lit = literal ? `.lit${literal.index + 1}` : "";
+        const target = vscode.Uri.from({
+          scheme: "rtl-canonical",
+          path: `/${base}${lit}.canonical.rtl`,
+          query: doc.uri.toString(),
+        });
+        canonical.set(target.toString(), res.text);
+        canonicalChanged.fire(target);
+        const view = await vscode.workspace.openTextDocument(target);
+        await vscode.window.showTextDocument(view, {
+          viewColumn: vscode.ViewColumn.Beside,
+          preview: true,
+        });
+      }
+    )
+  );
+
   context.subscriptions.push(
     vscode.commands.registerCommand(
       "rtl.selectFixture",

@@ -14,6 +14,7 @@ use std::sync::Arc;
 use std::time::Duration;
 
 use analysis::{completion_ctx, fragment_occurrences, punct_at, tags, word_at, CompletionCtx};
+use serde::{Deserialize, Serialize};
 use tokio::sync::Mutex;
 use tower_lsp::jsonrpc::Result;
 use tower_lsp::lsp_types::*;
@@ -564,30 +565,94 @@ fn document_symbols(text: &str) -> Vec<DocumentSymbol> {
     out
 }
 
+/// Params/result of the custom request `rtl/canonicalize` (plan §5, phase 3
+/// item 5 as amended 2026-07-17): the canonical form of a pattern for a
+/// read-only view — `compile_permissive` → `AtpToRtlSerializer`.
+#[derive(Debug, Deserialize)]
+#[serde(rename_all = "camelCase")]
+struct CanonicalizeParams {
+    pattern_uri: String,
+    /// RTL source extracted by the client (host-language string literals);
+    /// wins over reading the document at `pattern_uri`.
+    #[serde(default)]
+    pattern_text: Option<String>,
+}
+
+#[derive(Debug, Serialize)]
+#[serde(rename_all = "camelCase")]
+struct CanonicalizeResult {
+    #[serde(skip_serializing_if = "Option::is_none")]
+    text: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    error: Option<String>,
+}
+
+/// Canonical (normalized) form of the pattern: inherited actions are pushed
+/// down to atoms, layout and comments are not preserved — same form as the
+/// `.expected.rtl` files of the conformance corpus.
+fn canonical_form(text: &str) -> std::result::Result<String, String> {
+    let atp = pyregtab::rtl::compile_permissive(text).map_err(|e| {
+        if e.line >= 0 {
+            format!("RTL compile error at {}:{}: {}", e.line, e.col, e.msg)
+        } else {
+            format!("RTL compile error: {}", e.msg)
+        }
+    })?;
+    pyregtab::rtl::serialize::serialize(&atp)
+        .map_err(|e| format!("serialization error: {}", preview::err_text(&e)))
+}
+
 impl Backend {
+    /// The pattern source a custom request acts on: the client-extracted
+    /// text if given, else the synced or on-disk document at `pattern_uri`.
+    async fn pattern_source(
+        &self,
+        pattern_uri: &str,
+        pattern_text: Option<String>,
+    ) -> Result<String> {
+        if let Some(t) = pattern_text {
+            return Ok(t);
+        }
+        let uri = Url::parse(pattern_uri)
+            .map_err(|e| tower_lsp::jsonrpc::Error::invalid_params(e.to_string()))?;
+        match self.doc_text(&uri).await {
+            Some(t) => Ok(t),
+            None => uri
+                .to_file_path()
+                .ok()
+                .and_then(|p| std::fs::read_to_string(p).ok())
+                .ok_or_else(|| {
+                    tower_lsp::jsonrpc::Error::invalid_params("unknown pattern document")
+                }),
+        }
+    }
+
     /// Custom request `rtl/matchFixture` (plan §5, phase 4).
     async fn match_fixture(
         &self,
         params: preview::MatchFixtureParams,
     ) -> Result<preview::MatchFixtureResult> {
-        let text = match params.pattern_text {
-            Some(t) => t,
-            None => {
-                let uri = Url::parse(&params.pattern_uri)
-                    .map_err(|e| tower_lsp::jsonrpc::Error::invalid_params(e.to_string()))?;
-                match self.doc_text(&uri).await {
-                    Some(t) => t,
-                    None => uri
-                        .to_file_path()
-                        .ok()
-                        .and_then(|p| std::fs::read_to_string(p).ok())
-                        .ok_or_else(|| {
-                            tower_lsp::jsonrpc::Error::invalid_params("unknown pattern document")
-                        })?,
-                }
-            }
-        };
+        let text = self
+            .pattern_source(&params.pattern_uri, params.pattern_text)
+            .await?;
         Ok(preview::match_fixture(&text, &params.fixture_path))
+    }
+
+    /// Custom request `rtl/canonicalize` (plan §5, phase 3 item 5).
+    async fn canonicalize(&self, params: CanonicalizeParams) -> Result<CanonicalizeResult> {
+        let text = self
+            .pattern_source(&params.pattern_uri, params.pattern_text)
+            .await?;
+        Ok(match canonical_form(&text) {
+            Ok(text) => CanonicalizeResult {
+                text: Some(text),
+                error: None,
+            },
+            Err(error) => CanonicalizeResult {
+                text: None,
+                error: Some(error),
+            },
+        })
     }
 }
 
@@ -595,6 +660,7 @@ impl Backend {
 async fn main() {
     let (service, socket) = LspService::build(Backend::new)
         .custom_method("rtl/matchFixture", Backend::match_fixture)
+        .custom_method("rtl/canonicalize", Backend::canonicalize)
         .finish();
     Server::new(tokio::io::stdin(), tokio::io::stdout(), socket)
         .serve(service)
@@ -630,6 +696,28 @@ mod tests {
     fn unknown_position_maps_to_document_start() {
         let r = error_range("x", -1, -1);
         assert_eq!((r.start.line, r.start.character, r.end.character), (0, 0, 1));
+    }
+
+    #[test]
+    fn canonical_form_desugars_and_is_idempotent() {
+        // Inherited action: `->REC` on the cell is pushed down to the atom.
+        let canon = canonical_form("[ [VAL : ST*->REC] ]+").expect("canonical form");
+        assert!(!canon.contains("//"), "no comments in canonical form: {canon}");
+        let again = canonical_form(&canon).expect("canonical form recompiles");
+        assert_eq!(canon, again, "canonicalization must be idempotent");
+    }
+
+    #[test]
+    fn canonical_form_drops_comments_and_layout() {
+        let canon = canonical_form("// fixture: t.csv\n[ [VAL] ]").expect("canonical form");
+        assert!(!canon.contains("fixture"), "{canon}");
+        assert!(!canon.contains('\n'), "single-line output: {canon}");
+    }
+
+    #[test]
+    fn canonical_form_reports_compile_errors() {
+        let err = canonical_form("[ [VAL : ->REC] ]").unwrap_err();
+        assert!(err.contains("RTL compile error at 1:3"), "{err}");
     }
 
     #[test]

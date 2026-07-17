@@ -5,6 +5,19 @@ The extension follows [semver](https://semver.org) independently of
 jRegTab/pyRegTab versions; the pinned normative grammar version is recorded
 in the README.
 
+## 0.6.0
+
+- **RTL: Show Canonical Form** (plan §5, phase 3 item 5 as amended): a new
+  command that shows the canonical (normalized) form of the pattern —
+  inherited actions pushed down to atoms, the same form as the
+  `.expected.rtl` files of the conformance corpus — in a read-only editor
+  beside the source. Useful for debugging match semantics ("what did the
+  compiler actually understand?") and for comparing differently written
+  patterns for equivalence. Works on `.rtl` files and on RTL string literals
+  in Python/Java. Deliberately **not** a formatter: canonicalization drops
+  comments (including the `// fixture:` directive) and the authored layout,
+  so it never touches the source document.
+
 ## 0.5.1
 
 - Fix: the **▶ Preview RTL…** CodeLens now appears on Python and Java files

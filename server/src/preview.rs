@@ -155,7 +155,7 @@ fn run(pattern: &str, grid: &[Vec<String>]) -> Result<MatchFixtureResult, String
     })
 }
 
-fn err_text(e: &pyregtab::util::CoreErr) -> String {
+pub fn err_text(e: &pyregtab::util::CoreErr) -> String {
     match e {
         pyregtab::util::CoreErr::Msg(m) => m.clone(),
     }

@@ -33,6 +33,12 @@ runtime at all.
   template for whole directories of patterns. Works on `.rtl` files **and on
   RTL string literals in Python/Java** (`RtlCompiler.compile`, `@RtlSource`,
   `language=RTL` markers) via a CodeLens on each literal.
+- **Canonical form on demand** — the *RTL: Show Canonical Form* command opens
+  a read-only view of the normalized pattern (inherited actions pushed down
+  to atoms): see what the compiler actually understood, or compare two
+  differently written patterns for equivalence. It is intentionally not a
+  formatter — canonicalization drops comments and layout, so your source is
+  never touched.
 - **Hover reference** on every RTL keyword — constraint semantics, action
   effects, extractor behavior — generated from the normative RTL reference.
 - **Context-aware completion** — actions after `->`, extractors after `=`,

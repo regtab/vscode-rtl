@@ -6,6 +6,7 @@ import {
   LanguageClientOptions,
   ServerOptions,
 } from "vscode-languageclient/node";
+import { registerEmbeddedDiagnostics } from "./embeddedDiagnostics";
 import { fixtureCandidates, memoKey } from "./fixtures";
 import { findRtlLiterals, RtlLiteral } from "./literals";
 import { PreviewManager } from "./preview";
@@ -30,6 +31,9 @@ export async function activate(
   // Test Explorer (plan §5, phase 4 item 6). Cheap to create: discovery runs
   // when the Testing view is first opened, the server on the first run.
   registerTests(context, () => ensureServer(context));
+  // Diagnostics inside Python/Java RTL literals (plan §5, phase 5 step 1).
+  // Starts the server only when a host file actually contains RTL literals.
+  registerEmbeddedDiagnostics(context, () => ensureServer(context));
 
   // Start the server when RTL is actually used: an open .rtl document (for
   // diagnostics) now or later. Preview requests start it on demand too.

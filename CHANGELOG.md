@@ -5,6 +5,19 @@ The extension follows [semver](https://semver.org) independently of
 jRegTab/pyRegTab versions; the pinned normative grammar version is recorded
 in the README.
 
+## 0.8.0
+
+- **Diagnostics for RTL inside Python/Java string literals** (plan §5,
+  phase 5 step 1): compile errors in patterns embedded via
+  `RtlCompiler.compile(…)`, `@RtlSource(…)` or a `/* language=RTL */` marker
+  are now underlined directly in the host file, at the exact source
+  position — escape sequences and the incidental indentation of Java text
+  blocks are accounted for by an offset map built during extraction. Same
+  limitations as highlighting and preview: the opening quote must be on the
+  trigger's line; concatenation and f-strings are not recognized.
+- The rtl-lsp server now also starts when an open Python/Java file actually
+  contains RTL literals (it still never starts for host files without RTL).
+
 ## 0.7.0
 
 - **Expected-result diff in the preview** (plan §5, phase 4 item 5): bind an

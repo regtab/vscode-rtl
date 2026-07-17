@@ -565,6 +565,16 @@ fn document_symbols(text: &str) -> Vec<DocumentSymbol> {
     out
 }
 
+/// Params of the custom request `rtl/check` (plan §5, phase 5 step 1):
+/// compile a client-extracted pattern (a host-language string literal) and
+/// return the diagnostics in the coordinates of the extracted text — the
+/// client maps them back into the host document through its offset map.
+#[derive(Debug, Deserialize)]
+#[serde(rename_all = "camelCase")]
+struct CheckParams {
+    text: String,
+}
+
 /// Params/result of the custom request `rtl/canonicalize` (plan §5, phase 3
 /// item 5 as amended 2026-07-17): the canonical form of a pattern for a
 /// read-only view — `compile_permissive` → `AtpToRtlSerializer`.
@@ -642,6 +652,11 @@ impl Backend {
         ))
     }
 
+    /// Custom request `rtl/check` (plan §5, phase 5 step 1).
+    async fn check(&self, params: CheckParams) -> Result<Vec<Diagnostic>> {
+        Ok(diagnostics(&params.text))
+    }
+
     /// Custom request `rtl/canonicalize` (plan §5, phase 3 item 5).
     async fn canonicalize(&self, params: CanonicalizeParams) -> Result<CanonicalizeResult> {
         let text = self
@@ -665,6 +680,7 @@ async fn main() {
     let (service, socket) = LspService::build(Backend::new)
         .custom_method("rtl/matchFixture", Backend::match_fixture)
         .custom_method("rtl/canonicalize", Backend::canonicalize)
+        .custom_method("rtl/check", Backend::check)
         .finish();
     Server::new(tokio::io::stdin(), tokio::io::stdout(), socket)
         .serve(service)

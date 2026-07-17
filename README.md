@@ -20,11 +20,13 @@ runtime at all.
 
 - **Compile diagnostics as you type** — powered by `rtl-lsp`, a standalone
   native language server built on the RegTab Rust core. Errors are underlined
-  at the exact source position with the compiler's message. `EXT('…')`
-  predicates are never reported as unbound while editing standalone files
-  (they bind to the host runtime only at run time). Platform-specific builds
-  bundle the server; on other platforms point `rtl.server.path` at your own
-  binary, or use the extension with highlighting only.
+  at the exact source position with the compiler's message — in `.rtl` files
+  **and inside RTL string literals in Python/Java** (escapes and text-block
+  indentation are mapped back correctly). `EXT('…')` predicates are never
+  reported as unbound while editing standalone files (they bind to the host
+  runtime only at run time). Platform-specific builds bundle the server; on
+  other platforms point `rtl.server.path` at your own binary, or use the
+  extension with highlighting only.
 - **Live match preview** — run the pattern against a CSV fixture: each
   matched cell-derived item's segment is colored by role (VAL / ATTR / AUX)
   inside the cell text, the extracted recordset is shown alongside, and the
@@ -99,8 +101,7 @@ var atp = RtlCompiler.compile("[ [VAL: 'LABEL'->AVP] ]+");
 ## Roadmap
 
 - Excel fixtures in the preview (cell styles that CSV cannot carry).
-- Diagnostics for RTL embedded in Python/Java string literals (the preview
-  already works there).
+- Semantic highlighting refinements on top of the TextMate grammar.
 
 ## Grammar version
 

@@ -100,3 +100,53 @@ describe("stripTextBlockIndent", () => {
     assert.strictEqual(stripTextBlockIndent("\nx\ny\n"), "x\ny");
   });
 });
+
+describe("offset maps (plan §5, phase 5 step 1)", () => {
+  it("identity for a raw Python string", () => {
+    const src = String.raw`RtlCompiler.compile(r"[ [VAL\d] ]")`;
+    const lit = findRtlLiterals(src, "python")[0];
+    for (let k = 0; k <= lit.text.length; k++) {
+      assert.strictEqual(lit.map[k], lit.start + k);
+    }
+  });
+
+  it("collapses escapes: extracted offsets point at the escape start", () => {
+    // Host source: compile("a\nb") — the \n is two chars (backslash, n).
+    const src = String.raw`RtlCompiler.compile("a\nb")`;
+    const lit = findRtlLiterals(src, "python")[0];
+    assert.strictEqual(lit.text, "a\nb"); // real newline after unescape
+    assert.strictEqual(src[lit.map[0]], "a");
+    assert.strictEqual(src.slice(lit.map[1], lit.map[1] + 2), "\\n");
+    assert.strictEqual(src[lit.map[2]], "b");
+    assert.strictEqual(lit.map[3], lit.end);
+  });
+
+  it("maps through text-block indent stripping", () => {
+    const src = 'RtlCompiler.compile("""\n    [ [VAL] ]\n      [X]\n    """)';
+    const lit = findRtlLiterals(src, "java")[0];
+    assert.strictEqual(lit.text, "[ [VAL] ]\n  [X]");
+    // Every mapped char must equal the char it claims to come from.
+    for (let k = 0; k < lit.text.length; k++) {
+      assert.strictEqual(src[lit.map[k]], lit.text[k], `char ${k}`);
+    }
+    assert.strictEqual(lit.map[lit.text.length], lit.end);
+    // "VAL" starts at extracted offset 3; in the host it sits past the
+    // 4 stripped indent spaces.
+    assert.strictEqual(src.slice(lit.map[3], lit.map[3] + 3), "VAL");
+  });
+
+  it("maps a Java single-line literal with escapes", () => {
+    const src = String.raw`RtlCompiler.compile("[ [VAL=REPL(\"x\",\"y\")] ]")`;
+    const lit = findRtlLiterals(src, "java")[0];
+    assert.strictEqual(lit.text, '[ [VAL=REPL("x","y")] ]');
+    for (let k = 0; k < lit.text.length; k++) {
+      const mapped = src[lit.map[k]];
+      // An escape maps to its backslash; the produced char follows it.
+      assert.ok(
+        mapped === lit.text[k] ||
+          (mapped === "\\" && src[lit.map[k] + 1] === lit.text[k]),
+        `char ${k}: ${mapped}`
+      );
+    }
+  });
+});

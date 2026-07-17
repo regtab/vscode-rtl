@@ -113,4 +113,39 @@ describe("RTL extension smoke", () => {
     assert.deepStrictEqual(bad.expected.missing, [["MOW", "1999"]]);
     assert.deepStrictEqual(bad.expected.extra, [["SVO", "2021"]]);
   });
+
+  it("underlines RTL errors inside a Python literal at host coordinates", async () => {
+    const py = path.join(path.dirname(file), "emb.py");
+    fs.writeFileSync(
+      py,
+      'from pyregtab import RtlCompiler\n' +
+        'p = RtlCompiler.compile("""\n' +
+        "[ [VAL : ->REC] ]\n" +
+        '""")\n'
+    );
+    const doc = await vscode.workspace.openTextDocument(py);
+    await vscode.window.showTextDocument(doc);
+    assert.strictEqual(doc.languageId, "python");
+
+    const diags = await waitFor(() => {
+      const d = vscode.languages.getDiagnostics(doc.uri);
+      return d.length > 0 ? d : undefined;
+    }, 20000);
+    assert.strictEqual(diags.length, 1);
+    assert.strictEqual(diags[0].source, "rtl");
+    // Same position as in an equivalent .rtl file, shifted into the host:
+    // "VAL" on the literal's second line = file line 2, cols 3..6.
+    assert.strictEqual(diags[0].range.start.line, 2);
+    assert.strictEqual(diags[0].range.start.character, 3);
+    assert.strictEqual(diags[0].range.end.character, 6);
+
+    const editor = await vscode.window.showTextDocument(doc);
+    await editor.edit((edit) =>
+      edit.replace(new vscode.Range(2, 0, 2, 17), "[ [VAL : ST*->REC] ]")
+    );
+    await waitFor(
+      () => vscode.languages.getDiagnostics(doc.uri).length === 0 || undefined,
+      20000
+    );
+  });
 });

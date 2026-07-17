@@ -5,6 +5,17 @@ The extension follows [semver](https://semver.org) independently of
 jRegTab/pyRegTab versions; the pinned normative grammar version is recorded
 in the README.
 
+## 0.8.2
+
+- Snippet-style transforms in `rtl.fixtures.input` / `rtl.fixtures.expected`
+  templates: `${basename/regex/replacement/flags}` (the VS Code snippet
+  transform syntax). Lets a settings rule map host files whose names don't
+  literally match the fixture layout — e.g.
+  `${workspaceFolder}/src/test/resources/tasks/${basename/RtlTask(.+)Test/task_$1/}/input_*.csv`
+  binds jRegTab's `RtlTask001Test.java` to `tasks/task_001/` without touching
+  the sources. An invalid regex leaves the variable unsubstituted so the
+  failure is visible in the unresolved path.
+
 ## 0.8.1
 
 - `${workspaceFolder}` is now substituted in `// fixture:` and `// expected:`

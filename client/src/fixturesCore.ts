@@ -36,15 +36,33 @@ export function pairExpected(
 }
 
 /** Substitute ${basename}/${dir}/${workspaceFolder} and expand a trailing
- * `*` glob segment (magic in directory segments is not supported). */
+ * `*` glob segment (magic in directory segments is not supported).
+ * `${basename/regex/replacement/flags}` applies a snippet-style transform —
+ * for host files whose names don't literally match the fixture layout
+ * (e.g. `RtlTask001Test` → `task_001`). An invalid regex leaves the
+ * variable untouched, so the failure is visible in the resulting path. */
 export function expandTemplate(
   template: string,
   patternPath: string,
   workspaceFolder: string | undefined
 ): string[] {
   const dir = path.dirname(patternPath);
+  const basename = path.basename(patternPath, path.extname(patternPath));
   const substituted = template
-    .replace(/\$\{basename\}/g, path.basename(patternPath, path.extname(patternPath)))
+    .replace(
+      /\$\{basename\/((?:[^/\\]|\\.)+)\/((?:[^/\\]|\\.)*)\/([a-z]*)\}/g,
+      (whole, pattern: string, replacement: string, flags: string) => {
+        try {
+          return basename.replace(
+            new RegExp(pattern.replace(/\\\//g, "/"), flags),
+            replacement.replace(/\\\//g, "/")
+          );
+        } catch {
+          return whole;
+        }
+      }
+    )
+    .replace(/\$\{basename\}/g, basename)
     .replace(/\$\{dir\}/g, dir)
     .replace(/\$\{workspaceFolder\}/g, workspaceFolder ?? dir);
   const abs = path.isAbsolute(substituted)

@@ -99,4 +99,31 @@ describe("expandTemplate", () => {
       [path.join(dir, "input_1.csv"), path.join(dir, "input_2.csv")]
     );
   });
+
+  it("applies a snippet-style ${basename/…/…/} transform", () => {
+    const pattern = path.join(dir, "RtlTask001Test.java");
+    assert.deepStrictEqual(
+      expandTemplate("${dir}/${basename/RtlTask(.+)Test/task_$1/}.csv", pattern, undefined),
+      [path.join(dir, "task_001.csv")]
+    );
+  });
+
+  it("supports transform flags and escaped slashes", () => {
+    const pattern = path.join(dir, "a-b-c.rtl");
+    assert.deepStrictEqual(
+      expandTemplate("${dir}/${basename/-/_/g}.csv", pattern, undefined),
+      [path.join(dir, "a_b_c.csv")]
+    );
+    assert.deepStrictEqual(
+      expandTemplate("${dir}/${basename/a\\/x/y/}.csv", pattern, undefined),
+      [path.join(dir, "a-b-c.csv")] // pattern "a/x" does not match — basename unchanged
+    );
+  });
+
+  it("leaves an invalid transform regex untouched in the path", () => {
+    const pattern = path.join(dir, "task.rtl");
+    const out = expandTemplate("${dir}/${basename/(/x/}.csv", pattern, undefined);
+    assert.strictEqual(out.length, 1);
+    assert.ok(out[0].includes("${basename")); // separators may be normalized
+  });
 });

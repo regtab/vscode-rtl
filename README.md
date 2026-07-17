@@ -33,6 +33,15 @@ runtime at all.
   template for whole directories of patterns. Works on `.rtl` files **and on
   RTL string literals in Python/Java** (`RtlCompiler.compile`, `@RtlSource`,
   `language=RTL` markers) via a CodeLens on each literal.
+- **Expected-result diff** — bind an expected CSV to a fixture (an
+  `// expected:` directive or the `rtl.fixtures.expected` template) and the
+  preview turns red/green: it diffs the extracted recordset against the
+  expected rows (unordered multiset by default; header and row-order
+  policies are settings) and lists the missing and extra records.
+- **Test Explorer** — every pattern × fixture pair with an expected result
+  appears in VS Code's Testing view: run a whole directory of patterns and
+  get pass/fail with the diff on failures — regression checks for pattern
+  catalogs, no Python or JDK required.
 - **Canonical form on demand** — the *RTL: Show Canonical Form* command opens
   a read-only view of the normalized pattern (inherited actions pushed down
   to atoms): see what the compiler actually understood, or compare two
@@ -89,9 +98,7 @@ var atp = RtlCompiler.compile("[ [VAL: 'LABEL'->AVP] ]+");
 
 ## Roadmap
 
-- Preview: diff the extracted recordset against an expected CSV
-  (`rtl.fixtures.expected`), Excel fixtures, a Test Explorer over
-  pattern × fixture pairs.
+- Excel fixtures in the preview (cell styles that CSV cannot carry).
 - Diagnostics for RTL embedded in Python/Java string literals (the preview
   already works there).
 

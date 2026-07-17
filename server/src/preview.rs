@@ -20,6 +20,27 @@ pub struct MatchFixtureParams {
     /// the document at `pattern_uri`.
     #[serde(default)]
     pub pattern_text: Option<String>,
+    /// Expected recordset to diff against (plan §5, phase 4 item 5).
+    #[serde(default)]
+    pub expected: Option<ExpectedSpec>,
+}
+
+/// What to compare the extracted recordset with, and how. The comparison
+/// semantics mirror the data-wrangling-eval harness (`harness/compare.py`):
+/// a row is an ordered tuple of cells (column order significant), rows are
+/// compared as a multiset unless `ordered_rows`, cells compare exactly.
+#[derive(Debug, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct ExpectedSpec {
+    /// Path of the expected CSV.
+    pub path: String,
+    /// First expected row holds column names: it is checked positionally
+    /// against the recordset schema, the rest are data rows.
+    #[serde(default)]
+    pub has_header: bool,
+    /// Row order is significant (bag comparison otherwise).
+    #[serde(default)]
+    pub ordered_rows: bool,
 }
 
 #[derive(Debug, Serialize, Default)]
@@ -32,6 +53,28 @@ pub struct MatchFixtureResult {
     pub schema: Vec<String>,
     pub records: Vec<Vec<Option<String>>>,
     pub matched: bool,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub error: Option<String>,
+    /// Diff against the expected recordset, when an `ExpectedSpec` was given
+    /// and the pattern compiled (plan §5, phase 4 item 5).
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub expected: Option<ExpectedCheck>,
+}
+
+#[derive(Debug, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct ExpectedCheck {
+    pub path: String,
+    pub pass: bool,
+    /// Rows present in the expected CSV but absent from the recordset
+    /// (multiset difference, in expected-file order).
+    pub missing: Vec<Vec<String>>,
+    /// Recordset rows absent from the expected CSV.
+    pub extra: Vec<Vec<String>>,
+    /// Set when `has_header` and the header row differs from the schema.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub header_mismatch: Option<String>,
+    /// Set when the expected CSV could not be read; other fields are empty.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub error: Option<String>,
 }
@@ -75,7 +118,11 @@ pub fn read_csv(path: &str) -> Result<Vec<Vec<String>>, String> {
     Ok(grid)
 }
 
-pub fn match_fixture(pattern: &str, fixture_path: &str) -> MatchFixtureResult {
+pub fn match_fixture(
+    pattern: &str,
+    fixture_path: &str,
+    expected: Option<&ExpectedSpec>,
+) -> MatchFixtureResult {
     let grid = match read_csv(fixture_path) {
         Ok(g) => g,
         Err(e) => {
@@ -88,6 +135,8 @@ pub fn match_fixture(pattern: &str, fixture_path: &str) -> MatchFixtureResult {
     match run(pattern, &grid) {
         Ok(mut res) => {
             res.table = grid;
+            // An unmatched pattern still gets a diff: everything is missing.
+            res.expected = expected.map(|s| check_expected(s, &res.schema, &res.records));
             res
         }
         Err(e) => MatchFixtureResult {
@@ -96,6 +145,86 @@ pub fn match_fixture(pattern: &str, fixture_path: &str) -> MatchFixtureResult {
             ..MatchFixtureResult::default()
         },
     }
+}
+
+/// Compare the extracted recordset against the expected CSV (semantics of
+/// `harness/compare.py` in data-wrangling-eval; see `ExpectedSpec`).
+pub fn check_expected(
+    spec: &ExpectedSpec,
+    schema: &[String],
+    records: &[Vec<Option<String>>],
+) -> ExpectedCheck {
+    let mut check = ExpectedCheck {
+        path: spec.path.clone(),
+        pass: false,
+        missing: Vec::new(),
+        extra: Vec::new(),
+        header_mismatch: None,
+        error: None,
+    };
+    let grid = match read_csv(&spec.path) {
+        Ok(g) => g,
+        Err(e) => {
+            check.error = Some(e);
+            return check;
+        }
+    };
+    let produced: Vec<Vec<String>> = records
+        .iter()
+        .map(|r| r.iter().map(|v| v.clone().unwrap_or_default()).collect())
+        .collect();
+    let data: &[Vec<String>] = if spec.has_header {
+        let header = &grid[0];
+        if header.as_slice() != schema {
+            check.header_mismatch = Some(format!(
+                "expected columns [{}], recordset schema [{}]",
+                header.join(", "),
+                schema.join(", ")
+            ));
+        }
+        &grid[1..]
+    } else {
+        &grid
+    };
+    let (missing, extra) = bag_diff(&produced, data);
+    let rows_equal = if spec.ordered_rows {
+        produced == data
+    } else {
+        missing.is_empty() && extra.is_empty()
+    };
+    check.pass = rows_equal && check.header_mismatch.is_none();
+    check.missing = missing;
+    check.extra = extra;
+    check
+}
+
+/// Multiset difference of rows: (expected − actual, actual − expected),
+/// each in its source order.
+fn bag_diff(
+    actual: &[Vec<String>],
+    expected: &[Vec<String>],
+) -> (Vec<Vec<String>>, Vec<Vec<String>>) {
+    let mut count: std::collections::HashMap<&[String], i64> = std::collections::HashMap::new();
+    for r in actual {
+        *count.entry(r.as_slice()).or_default() += 1;
+    }
+    let mut missing = Vec::new();
+    for r in expected {
+        let c = count.entry(r.as_slice()).or_default();
+        *c -= 1;
+        if *c < 0 {
+            missing.push(r.clone());
+        }
+    }
+    let mut extra = Vec::new();
+    for r in actual {
+        let c = count.get_mut(r.as_slice()).unwrap();
+        if *c > 0 {
+            extra.push(r.clone());
+            *c -= 1;
+        }
+    }
+    (missing, extra)
 }
 
 fn run(pattern: &str, grid: &[Vec<String>]) -> Result<MatchFixtureResult, String> {
@@ -152,6 +281,7 @@ fn run(pattern: &str, grid: &[Vec<String>]) -> Result<MatchFixtureResult, String
         records: rs.records.into_iter().map(|r| r.values).collect(),
         matched: true,
         error: None,
+        expected: None, // filled by the caller
     })
 }
 
@@ -180,6 +310,98 @@ fn byte_span_to_chars(text: &str, span: (usize, usize)) -> (usize, usize) {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    fn expected_csv(name: &str, content: &str) -> String {
+        let path = std::env::temp_dir().join(format!("rtl_lsp_test_{name}.csv"));
+        std::fs::write(&path, content).unwrap();
+        path.to_string_lossy().to_string()
+    }
+
+    fn spec(path: String, has_header: bool, ordered_rows: bool) -> ExpectedSpec {
+        ExpectedSpec {
+            path,
+            has_header,
+            ordered_rows,
+        }
+    }
+
+    fn rec(vals: &[&str]) -> Vec<Option<String>> {
+        vals.iter().map(|v| Some(v.to_string())).collect()
+    }
+
+    #[test]
+    fn expected_bag_comparison_ignores_row_order() {
+        let path = expected_csv("bag", "b,2\na,1\n");
+        let schema = vec!["X".to_string(), "Y".to_string()];
+        let records = vec![rec(&["a", "1"]), rec(&["b", "2"])];
+        let check = check_expected(&spec(path, false, false), &schema, &records);
+        assert!(check.pass, "{check:?}");
+        assert!(check.missing.is_empty() && check.extra.is_empty());
+    }
+
+    #[test]
+    fn expected_diff_counts_duplicates() {
+        // expected has "a,1" twice; recordset has it once plus a stray row.
+        let path = expected_csv("dups", "a,1\na,1\n");
+        let schema = vec!["X".to_string(), "Y".to_string()];
+        let records = vec![rec(&["a", "1"]), rec(&["z", "9"])];
+        let check = check_expected(&spec(path, false, false), &schema, &records);
+        assert!(!check.pass);
+        assert_eq!(check.missing, vec![vec!["a".to_string(), "1".to_string()]]);
+        assert_eq!(check.extra, vec![vec!["z".to_string(), "9".to_string()]]);
+    }
+
+    #[test]
+    fn expected_header_is_checked_positionally_against_schema() {
+        let path = expected_csv("header", "X,Y\na,1\n");
+        let records = vec![rec(&["a", "1"])];
+        let ok = check_expected(
+            &spec(path.clone(), true, false),
+            &["X".to_string(), "Y".to_string()],
+            &records,
+        );
+        assert!(ok.pass, "{ok:?}");
+        let bad = check_expected(
+            &spec(path, true, false),
+            &["Y".to_string(), "X".to_string()],
+            &records,
+        );
+        assert!(!bad.pass);
+        assert!(bad.header_mismatch.is_some());
+        assert!(bad.missing.is_empty(), "data rows still match: {bad:?}");
+    }
+
+    #[test]
+    fn ordered_rows_fails_on_reordering_with_empty_diff() {
+        let path = expected_csv("ordered", "a,1\nb,2\n");
+        let schema = vec!["X".to_string(), "Y".to_string()];
+        let records = vec![rec(&["b", "2"]), rec(&["a", "1"])];
+        let check = check_expected(&spec(path, false, true), &schema, &records);
+        assert!(!check.pass);
+        assert!(check.missing.is_empty() && check.extra.is_empty());
+    }
+
+    #[test]
+    fn missing_values_compare_as_empty_cells() {
+        let path = expected_csv("nulls", "a,\n");
+        let check = check_expected(
+            &spec(path, false, false),
+            &["X".to_string(), "Y".to_string()],
+            &[vec![Some("a".to_string()), None]],
+        );
+        assert!(check.pass, "{check:?}");
+    }
+
+    #[test]
+    fn unreadable_expected_reports_an_error() {
+        let check = check_expected(
+            &spec("no/such/file.csv".to_string(), false, false),
+            &[],
+            &[],
+        );
+        assert!(!check.pass);
+        assert!(check.error.is_some());
+    }
 
     #[test]
     fn end_to_end_match_on_grid() {

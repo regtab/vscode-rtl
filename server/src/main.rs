@@ -635,7 +635,11 @@ impl Backend {
         let text = self
             .pattern_source(&params.pattern_uri, params.pattern_text)
             .await?;
-        Ok(preview::match_fixture(&text, &params.fixture_path))
+        Ok(preview::match_fixture(
+            &text,
+            &params.fixture_path,
+            params.expected.as_ref(),
+        ))
     }
 
     /// Custom request `rtl/canonicalize` (plan §5, phase 3 item 5).

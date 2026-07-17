@@ -83,4 +83,34 @@ describe("RTL extension smoke", () => {
     // Canonicalization drops comments — that is why it is not a formatter.
     assert.ok(!canon.includes("fixture"), canon);
   });
+
+  it("diffs the recordset against an expected CSV (rtl/matchFixture)", async () => {
+    const dir = path.dirname(file);
+    fs.writeFileSync(path.join(dir, "in.csv"), "City,Year\nIKT,2020\nSVO,2021\n");
+    fs.writeFileSync(path.join(dir, "good.csv"), "SVO,2021\nIKT,2020\n");
+    fs.writeFileSync(path.join(dir, "bad.csv"), "IKT,2020\nMOW,1999\n");
+    const pattern = path.join(dir, "diff.rtl");
+    fs.writeFileSync(
+      pattern,
+      "[ [ATTR]{2} ]\n[ [VAL : SC->AVP, SR*->REC] [VAL : SC->AVP] ]+\n"
+    );
+
+    const ext = vscode.extensions.getExtension("regtab.rtl");
+    const api = await ext.activate();
+    const ask = (expectedCsv) =>
+      api.request("rtl/matchFixture", {
+        patternUri: vscode.Uri.file(pattern).toString(),
+        fixturePath: path.join(dir, "in.csv"),
+        expected: { path: path.join(dir, expectedCsv) },
+      });
+
+    // Bag semantics: rows in a different order still pass.
+    const good = await ask("good.csv");
+    assert.strictEqual(good.expected.pass, true, JSON.stringify(good.expected));
+
+    const bad = await ask("bad.csv");
+    assert.strictEqual(bad.expected.pass, false);
+    assert.deepStrictEqual(bad.expected.missing, [["MOW", "1999"]]);
+    assert.deepStrictEqual(bad.expected.extra, [["SVO", "2021"]]);
+  });
 });

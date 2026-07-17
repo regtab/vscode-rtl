@@ -2,7 +2,7 @@
   "name": "rtl",
   "displayName": "RegTab RTL",
   "description": "Regular Table Language (RTL) support — the table-pattern DSL of the RegTab project: syntax highlighting for .rtl files and for RTL embedded in Python and Java string literals, snippets, and editor configuration.",
-  "version": "0.6.0",
+  "version": "0.7.0",
   "publisher": "regtab",
   "license": "MIT",
   "icon": "icon.png",
@@ -24,7 +24,8 @@
   "main": "./dist/extension.js",
   "activationEvents": [
     "onLanguage:python",
-    "onLanguage:java"
+    "onLanguage:java",
+    "workspaceContains:**/*.rtl"
   ],
   "keywords": [
     "Regular Table Language",
@@ -123,6 +124,41 @@
             }
           }
         },
+        "rtl.fixtures.expected": {
+          "markdownDescription": "Template(s) that locate the expected result CSV(s) to diff the extracted recordset against — symmetric to `#rtl.fixtures.input#`: the same variables and trailing `*` glob, either a single template string or an array of `{pattern, expected, hasHeader?, orderedRows?}` rules (first match wins; the optional booleans override the global comparison settings for that rule). A multi-file expansion pairs with the input expansion positionally (both lists are sorted); a single file applies to every input. An `// expected: path` directive inside the pattern takes precedence (the i-th pairs with the i-th `// fixture:` directive). Patterns with an expected result also appear in the Test Explorer.",
+          "type": [
+            "string",
+            "array"
+          ],
+          "default": "",
+          "items": {
+            "type": "object",
+            "properties": {
+              "pattern": {
+                "type": "string"
+              },
+              "expected": {
+                "type": "string"
+              },
+              "hasHeader": {
+                "type": "boolean"
+              },
+              "orderedRows": {
+                "type": "boolean"
+              }
+            }
+          }
+        },
+        "rtl.fixtures.expectedHasHeader": {
+          "type": "boolean",
+          "default": false,
+          "description": "The first row of an expected CSV holds column names: it is checked positionally against the recordset schema, and only the remaining rows are data."
+        },
+        "rtl.fixtures.orderedRows": {
+          "type": "boolean",
+          "default": false,
+          "description": "Row order is significant when comparing the recordset with an expected CSV (rows are compared as an unordered multiset otherwise)."
+        },
         "rtl.server.path": {
           "type": "string",
           "default": "",
@@ -145,7 +181,7 @@
     "test": "npm run check:types && npm run test:grammar && npm run test:unit && npm run check:sync",
     "test:grammar": "vscode-tmgrammar-snap \"test/grammar/fixtures/*.rtl\"",
     "test:grammar:update": "vscode-tmgrammar-snap --updateSnapshot \"test/grammar/fixtures/*.rtl\"",
-    "test:unit": "esbuild test/unit/literals.test.ts --bundle --outfile=dist/test/literals.test.cjs --platform=node --format=cjs --external:mocha && mocha dist/test/literals.test.cjs",
+    "test:unit": "esbuild test/unit/*.test.ts --bundle --outdir=dist/test --out-extension:.js=.cjs --platform=node --format=cjs --external:mocha && mocha \"dist/test/*.cjs\"",
     "check:sync": "python tools/check_grammar_sync.py",
     "check:types": "tsc -p client",
     "test:e2e": "node test/e2e/runTests.js",

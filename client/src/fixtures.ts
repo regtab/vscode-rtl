@@ -1,11 +1,30 @@
 import * as fs from "fs";
 import * as path from "path";
 import * as vscode from "vscode";
+import { directivePaths, expandTemplate, pairExpected } from "./fixturesCore";
+
+export { directivePaths, expandTemplate, pairExpected } from "./fixturesCore";
 
 /** A workspace rule: apply `input` to .rtl files matching `pattern`. */
-interface FixtureRule {
+export interface FixtureRule {
   pattern: string;
   input: string;
+}
+
+/** A workspace rule binding expected CSVs (plan §5, phase 4 item 5).
+ * `hasHeader`/`orderedRows` override the global comparison settings. */
+export interface ExpectedRule {
+  pattern: string;
+  expected: string;
+  hasHeader?: boolean;
+  orderedRows?: boolean;
+}
+
+/** An expected CSV to diff the recordset against, with comparison options. */
+export interface ExpectedBinding {
+  path: string;
+  hasHeader: boolean;
+  orderedRows: boolean;
 }
 
 export function memoKey(uri: vscode.Uri, litIndex?: number): string {
@@ -36,79 +55,133 @@ export function fixtureCandidates(
   }
 
   const dir = path.dirname(doc.uri.fsPath);
-  const rtlText =
-    literal?.text ??
-    doc.getText(new vscode.Range(0, 0, Math.min(doc.lineCount, 20), 0));
-  for (const m of rtlText.matchAll(/^\s*\/\/\s*fixture:\s*(.+?)\s*$/gm)) {
-    push(path.resolve(dir, m[1]));
+  for (const p of directivePaths(directiveText(doc, literal), dir, "fixture")) {
+    push(p);
   }
 
-  for (const p of settingsCandidates(doc)) {
+  for (const p of settingsInputs(doc)) {
     push(p);
   }
   return out;
 }
 
-function settingsCandidates(doc: vscode.TextDocument): string[] {
+/** The expected CSV paired with `inputPath`, or undefined (plan §5, phase 4
+ * item 5). Sources, most specific first:
+ * 1. `// expected:` directives — the i-th pairs with the i-th `// fixture:`
+ *    directive; a lone one applies to any input.
+ * 2. `rtl.fixtures.expected` — template/rules symmetric to
+ *    `rtl.fixtures.input`; a multi-file expansion pairs with the input
+ *    expansion positionally (both are sorted), a single file applies to
+ *    every input. */
+export function expectedFor(
+  doc: vscode.TextDocument,
+  inputPath: string,
+  literal?: { text: string; index: number }
+): ExpectedBinding | undefined {
+  const dir = path.dirname(doc.uri.fsPath);
+  const text = directiveText(doc, literal);
+  const expDirectives = directivePaths(text, dir, "expected");
+  if (expDirectives.length > 0) {
+    const fixDirectives = directivePaths(text, dir, "fixture");
+    const i = fixDirectives.indexOf(inputPath);
+    const p =
+      expDirectives.length === 1
+        ? expDirectives[0]
+        : i >= 0
+          ? expDirectives[i]
+          : undefined;
+    if (p && fs.existsSync(p)) {
+      return { path: p, ...expectedOptions(doc.uri) };
+    }
+  }
+
+  const rule = firstMatch(expectedRules(doc.uri), doc);
+  if (!rule) {
+    return undefined;
+  }
+  const folder = vscode.workspace.getWorkspaceFolder(doc.uri)?.uri.fsPath;
+  const expecteds = expandTemplate(rule.expected, doc.uri.fsPath, folder);
+  const inputRule = firstMatch(inputRules(doc.uri), doc);
+  const inputs = inputRule
+    ? expandTemplate(inputRule.input, doc.uri.fsPath, folder)
+    : [];
+  const p = pairExpected(inputPath, inputs, expecteds);
+  return p && fs.existsSync(p)
+    ? { path: p, ...expectedOptions(doc.uri, rule) }
+    : undefined;
+}
+
+/** Comparison options: rule-level override wins over the global settings. */
+export function expectedOptions(
+  uri: vscode.Uri,
+  rule?: ExpectedRule
+): { hasHeader: boolean; orderedRows: boolean } {
+  const cfg = vscode.workspace.getConfiguration("rtl", uri);
+  return {
+    hasHeader: rule?.hasHeader ?? cfg.get<boolean>("fixtures.expectedHasHeader", false),
+    orderedRows: rule?.orderedRows ?? cfg.get<boolean>("fixtures.orderedRows", false),
+  };
+}
+
+/** The text scanned for `// fixture:` / `// expected:` directives: the whole
+ * extracted literal, or the leading lines of a `.rtl` document. */
+function directiveText(
+  doc: vscode.TextDocument,
+  literal?: { text: string; index: number }
+): string {
+  return (
+    literal?.text ??
+    doc.getText(new vscode.Range(0, 0, Math.min(doc.lineCount, 20), 0))
+  );
+}
+
+/** Normalized `rtl.fixtures.input` rules for a resource. */
+export function inputRules(uri: vscode.Uri): FixtureRule[] {
   const raw = vscode.workspace
-    .getConfiguration("rtl", doc.uri)
+    .getConfiguration("rtl", uri)
     .get<string | FixtureRule[]>("fixtures.input");
   if (!raw) {
     return [];
   }
-  const rules: FixtureRule[] =
-    typeof raw === "string" ? [{ pattern: "**/*", input: raw }] : raw;
+  return typeof raw === "string" ? [{ pattern: "**/*", input: raw }] : raw.filter((r) => r?.input);
+}
+
+/** Normalized `rtl.fixtures.expected` rules for a resource. */
+export function expectedRules(uri: vscode.Uri): ExpectedRule[] {
+  const raw = vscode.workspace
+    .getConfiguration("rtl", uri)
+    .get<string | ExpectedRule[]>("fixtures.expected");
+  if (!raw) {
+    return [];
+  }
+  return typeof raw === "string"
+    ? [{ pattern: "**/*", expected: raw }]
+    : raw.filter((r) => r?.expected);
+}
+
+/** First rule whose glob matches the document (plan §5, phase 4 item 1). */
+function firstMatch<R extends { pattern: string }>(
+  rules: R[],
+  doc: vscode.TextDocument
+): R | undefined {
   const folder = vscode.workspace.getWorkspaceFolder(doc.uri);
   for (const rule of rules) {
-    if (!rule?.input) {
-      continue;
-    }
     const selector: vscode.DocumentFilter = folder
       ? { pattern: new vscode.RelativePattern(folder, rule.pattern) }
       : { pattern: rule.pattern };
-    if (vscode.languages.match(selector, doc) === 0) {
-      continue;
+    if (vscode.languages.match(selector, doc) !== 0) {
+      return rule;
     }
-    // First matching rule wins (plan §5, phase 4 item 1).
-    return expandTemplate(rule.input, doc, folder);
   }
-  return [];
+  return undefined;
 }
 
-/** Substitute ${basename}/${dir}/${workspaceFolder} and expand a trailing
- * `*` glob segment (magic in directory segments is not supported). */
-function expandTemplate(
-  template: string,
-  doc: vscode.TextDocument,
-  folder: vscode.WorkspaceFolder | undefined
-): string[] {
-  const dir = path.dirname(doc.uri.fsPath);
-  const substituted = template
-    .replace(/\$\{basename\}/g, path.basename(doc.uri.fsPath, path.extname(doc.uri.fsPath)))
-    .replace(/\$\{dir\}/g, dir)
-    .replace(/\$\{workspaceFolder\}/g, folder ? folder.uri.fsPath : dir);
-  const abs = path.isAbsolute(substituted)
-    ? substituted
-    : path.resolve(dir, substituted);
-
-  const base = path.basename(abs);
-  if (!base.includes("*")) {
-    return [abs];
-  }
-  const parent = path.dirname(abs);
-  if (parent.includes("*") || !fs.existsSync(parent)) {
+function settingsInputs(doc: vscode.TextDocument): string[] {
+  const rule = firstMatch(inputRules(doc.uri), doc);
+  if (!rule) {
     return [];
   }
-  const rx = new RegExp(
-    "^" + base.split("*").map(escapeRegex).join(".*") + "$"
-  );
-  return fs
-    .readdirSync(parent)
-    .filter((f) => rx.test(f))
-    .sort()
-    .map((f) => path.join(parent, f));
+  const folder = vscode.workspace.getWorkspaceFolder(doc.uri)?.uri.fsPath;
+  return expandTemplate(rule.input, doc.uri.fsPath, folder);
 }
 
-function escapeRegex(s: string): string {
-  return s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-}

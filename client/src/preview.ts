@@ -1,6 +1,7 @@
 import * as path from "path";
 import * as vscode from "vscode";
 import { LanguageClient } from "vscode-languageclient/node";
+import { expectedFor } from "./fixtures";
 import { findRtlLiterals } from "./literals";
 
 interface CellRole {
@@ -16,6 +17,15 @@ interface CellRole {
   tags: string[];
 }
 
+interface ExpectedCheck {
+  path: string;
+  pass: boolean;
+  missing: string[][];
+  extra: string[][];
+  headerMismatch?: string;
+  error?: string;
+}
+
 interface MatchFixtureResult {
   table: string[][];
   cells: CellRole[];
@@ -23,6 +33,7 @@ interface MatchFixtureResult {
   records: (string | null)[][];
   matched: boolean;
   error?: string;
+  expected?: ExpectedCheck;
 }
 
 interface Target {
@@ -102,25 +113,32 @@ export class PreviewManager {
       );
     };
     let patternText: string | undefined;
+    let literal: { text: string; index: number } | undefined;
+    let doc: vscode.TextDocument;
+    try {
+      doc = await vscode.workspace.openTextDocument(target.uri);
+    } catch (e) {
+      fail(String(e));
+      return;
+    }
     if (target.litIndex !== undefined) {
-      try {
-        const doc = await vscode.workspace.openTextDocument(target.uri);
-        const lit = findRtlLiterals(doc.getText(), doc.languageId)[target.litIndex];
-        if (!lit) {
-          fail(`RTL literal #${target.litIndex + 1} no longer found in the document.`);
-          return;
-        }
-        patternText = lit.text;
-      } catch (e) {
-        fail(String(e));
+      const lit = findRtlLiterals(doc.getText(), doc.languageId)[target.litIndex];
+      if (!lit) {
+        fail(`RTL literal #${target.litIndex + 1} no longer found in the document.`);
         return;
       }
+      patternText = lit.text;
+      literal = { text: lit.text, index: target.litIndex };
     }
+    // Re-resolved on every refresh: an edited `// expected:` directive or a
+    // changed setting takes effect on the next re-run.
+    const expected = expectedFor(doc, target.fixture, literal);
     try {
       const result = await client.sendRequest<MatchFixtureResult>("rtl/matchFixture", {
         patternUri: target.uri.toString(),
         fixturePath: target.fixture,
         patternText,
+        expected,
       });
       panel.webview.html = render(result, path.basename(target.fixture));
     } catch (e) {
@@ -197,6 +215,8 @@ function render(r: MatchFixtureResult, fixtureName: string): string {
       ? `<div class="banner ok">Matched — ${r.records.length} record(s)</div>`
       : `<div class="banner warn">Pattern did not match the table</div>`;
 
+  const expected = r.expected ? renderExpected(r.expected) : "";
+
   return `<!DOCTYPE html><html><head><meta charset="utf-8"><style>
   body { font-family: var(--vscode-font-family); color: var(--vscode-foreground); }
   h3 { margin: 0.6em 0 0.3em; }
@@ -212,6 +232,9 @@ function render(r: MatchFixtureResult, fixtureName: string): string {
   .error { background: rgba(224, 64, 64, 0.25); white-space: pre-wrap; }
   .legend span { padding: 1px 6px; margin-right: 6px; border-radius: 3px; font-size: 0.85em; }
   .muted { opacity: 0.7; font-size: 0.9em; }
+  h4 { margin: 0.5em 0 0.2em; }
+  td.missing { color: #e05050; font-weight: bold; }
+  td.extra { color: #40a040; font-weight: bold; }
   </style></head><body>
   <div class="muted">Fixture: ${esc(fixtureName)}</div>
   ${status}
@@ -223,5 +246,54 @@ function render(r: MatchFixtureResult, fixtureName: string): string {
       ? `<h3>Recordset</h3><table><tr>${recHead}</tr>${recRows}</table>`
       : ""
   }
+  ${expected}
   </body></html>`;
+}
+
+/** Diff of the recordset against the expected CSV (plan §5, phase 4 item 5). */
+function renderExpected(e: ExpectedCheck): string {
+  const name = esc(path.basename(e.path));
+  if (e.error) {
+    return `<h3>Expected</h3><div class="banner error">${esc(e.error)}</div>`;
+  }
+  if (e.pass) {
+    return `<h3>Expected</h3><div class="banner ok">✓ Recordset matches ${name}</div>`;
+  }
+  const parts: string[] = [];
+  if (e.headerMismatch) {
+    parts.push(`<div class="banner warn">Header mismatch: ${esc(e.headerMismatch)}</div>`);
+  }
+  if (e.missing.length === 0 && e.extra.length === 0 && !e.headerMismatch) {
+    parts.push(
+      `<div class="banner warn">Rows match as a set but their order differs ` +
+        `(<code>orderedRows</code> is on)</div>`
+    );
+  }
+  const rows = (label: string, cls: string, sign: string, data: string[][]) => {
+    if (data.length === 0) {
+      return;
+    }
+    const cap = 20;
+    const body = data
+      .slice(0, cap)
+      .map(
+        (row) =>
+          `<tr><td class="${cls}">${sign}</td>` +
+          row.map((v) => `<td>${esc(v) || "&nbsp;"}</td>`).join("") +
+          "</tr>"
+      )
+      .join("\n");
+    const more =
+      data.length > cap
+        ? `<div class="muted">…and ${data.length - cap} more</div>`
+        : "";
+    parts.push(`<h4>${label} (${data.length})</h4><table>${body}</table>${more}`);
+  };
+  rows("Missing — in expected, not extracted", "missing", "−", e.missing);
+  rows("Extra — extracted, not in expected", "extra", "+", e.extra);
+  return (
+    `<h3>Expected</h3><div class="banner error">✗ Recordset differs from ${name}` +
+    ` — ${e.missing.length} missing, ${e.extra.length} extra</div>` +
+    parts.join("\n")
+  );
 }

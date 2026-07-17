@@ -9,16 +9,27 @@ import {
 import { fixtureCandidates, memoKey } from "./fixtures";
 import { findRtlLiterals, RtlLiteral } from "./literals";
 import { PreviewManager } from "./preview";
+import { registerTests } from "./tests";
 
 let client: LanguageClient | undefined;
 let starting: Promise<LanguageClient | undefined> | undefined;
 
-export async function activate(context: vscode.ExtensionContext): Promise<void> {
+/** Exported extension API (used by the e2e tests): a raw request to rtl-lsp. */
+export interface RtlExtensionApi {
+  request(method: string, params: unknown): Promise<unknown>;
+}
+
+export async function activate(
+  context: vscode.ExtensionContext
+): Promise<RtlExtensionApi> {
   // Cheap, always: register commands and CodeLens providers. The extension
   // also activates on Python/Java (see activationEvents) so the preview lens
   // shows on RTL string literals — but the server is started lazily below,
   // never merely because a host-language file is open.
   registerPreview(context, () => ensureServer(context));
+  // Test Explorer (plan §5, phase 4 item 6). Cheap to create: discovery runs
+  // when the Testing view is first opened, the server on the first run.
+  registerTests(context, () => ensureServer(context));
 
   // Start the server when RTL is actually used: an open .rtl document (for
   // diagnostics) now or later. Preview requests start it on demand too.
@@ -31,6 +42,16 @@ export async function activate(context: vscode.ExtensionContext): Promise<void> 
   context.subscriptions.push(
     vscode.workspace.onDidOpenTextDocument(startIfRtl)
   );
+
+  return {
+    request: async (method, params) => {
+      const c = await ensureServer(context);
+      if (!c) {
+        throw new Error("rtl-lsp server is not available");
+      }
+      return c.sendRequest(method, params);
+    },
+  };
 }
 
 /** Start the rtl-lsp language client once (idempotent). Returns undefined and

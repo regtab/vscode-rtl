@@ -5,6 +5,29 @@ The extension follows [semver](https://semver.org) independently of
 jRegTab/pyRegTab versions; the pinned normative grammar version is recorded
 in the README.
 
+## 0.7.0
+
+- **Expected-result diff in the preview** (plan §5, phase 4 item 5): bind an
+  expected CSV to a fixture and the preview shows whether the extracted
+  recordset matches it — ✓ green on success, otherwise the missing and extra
+  records (rows compare as an unordered multiset, column order significant,
+  cells exact — the data-wrangling-eval comparison semantics). Binding
+  sources, most specific first: an `// expected: path` directive (the i-th
+  pairs with the i-th `// fixture:`), or the `rtl.fixtures.expected`
+  setting — a template/rules array symmetric to `rtl.fixtures.input`
+  (a multi-file expansion pairs with the input expansion positionally, a
+  single file serves every input). Comparison options:
+  `rtl.fixtures.expectedHasHeader` (first expected row = column names,
+  checked positionally against the recordset schema) and
+  `rtl.fixtures.orderedRows`; both can be overridden per rule.
+- **Test Explorer** (plan §5, phase 4 item 6): every `.rtl` × input pair
+  with an expected result appears in VS Code's Testing view — run one
+  pattern or the whole catalog and get pass/fail with the diff text on
+  failures. Discovery is lazy (first opening of the Testing view) and
+  follows the same binding rules as the preview; the rtl-lsp server starts
+  on the first run. The extension now also activates when a workspace
+  contains `.rtl` files.
+
 ## 0.6.0
 
 - **RTL: Show Canonical Form** (plan §5, phase 3 item 5 as amended): a new

@@ -445,9 +445,12 @@ PR в pyregtab можно вести параллельно с фазой 1.
 2. **Excel в превью**: MVP — CSV; `calamine` добавить, когда превью докажет ценность
    (стили ячеек — шрифты/выравнивание — в CSV отсутствуют, а `TableSyntax` их
    поддерживает; для паттернов, чувствительных к стилям, Excel станет обязательным).
-3. **Идентификатор расширения** — РЕШЕНО (2026-07-11, до публикации): короткий
-   `regtab.rtl`, displayName «RegTab RTL». Унаследованный `rtl-language` отвергнут
-   как тавтология («Regular Table Language language»); паттерн — `golang.go`,
-   `rust-lang.rust`, `Prisma.prisma`. Менять id после публикации нельзя.
+3. **Идентификатор расширения** — РЕШЕНО: id `regtab.rtl` (2026-07-11;
+   унаследованный `rtl-language` отвергнут как тавтология «Regular Table
+   Language language»; паттерн — `golang.go`, `rust-lang.rust`,
+   `Prisma.prisma`; name-часть `regtab` не занимаем — общее имя пространства
+   `regtab.*` оставлено будущему extension pack'у). displayName —
+   «RegTab — Regular Table Language» (2026-07-18, см. §5-Ф0 п. 4).
+   Менять id после публикации нельзя, displayName — можно.
 4. **Где вести issue по языковым фичам** — здесь или в pyregtab? Рекомендация:
    всё редакторское — здесь; компиляторное (span ошибок, пермиссивный режим) — в pyregtab.

@@ -202,13 +202,26 @@ vscode-rtl/
    Имя «RegTab Tools» зарезервировано под будущий extension pack (когда
    инструментов станет больше одного расширения: линтер-плюс, визуальный
    дизайнер и т.п.), для одиночного расширения не используется.
-5. Регистрация publisher `regtab` (Azure DevOps + PAT), публикация:
-   `vsce publish` + `ovsx publish`.
-6. `pyregtab/ide/` → README-указатель сюда, файлы грамматик удалить (PR в pyregtab).
+5. Регистрация publisher `regtab` (Azure DevOps + PAT; регистрация — только
+   резервирование имени, публикацией не является), публикация в VS Code
+   Marketplace: `vsce publish`.
+6. После публикации: `.vscode/extensions.json` с
+   `"recommendations": ["regtab.rtl"]` в pyregtab и jregtab + коммит их
+   каталогов `.vscode/` (там уже лежат `settings.json` с правилами
+   `rtl.fixtures.*`, настроенные 2026-07-17/18). До публикации рекомендация
+   бессмысленна — Marketplace не найдёт id. Неизвестные ключи настроек и
+   рекомендации не мешают пользователям без VS Code / без расширения.
+7. *(опционально)* Публикация в Open VSX (open-vsx.org) — маркетплейс для
+   VSCodium, Gitpod, Theia и др.: аккаунт Eclipse Foundation (вход через
+   GitHub), подписать Publisher Agreement, `ovsx create-namespace regtab`
+   (резервирует namespace независимо от Microsoft Marketplace),
+   `ovsx publish`. `release.yml` уже умеет оба маркетплейса — нужен только
+   секрет с токеном.
+8. `pyregtab/ide/` → README-указатель сюда, файлы грамматик удалить (PR в pyregtab).
 
-**Критерии приёмки:** расширение ставится из Marketplace и Open VSX; `.rtl`-файлы
-корпуса подсвечиваются; RTL внутри Python- и Java-строк подсвечивается; универсальный
-VSIX < 200 КБ.
+**Критерии приёмки:** расширение ставится из Marketplace (и из Open VSX, если
+выполнен опциональный п. 7); `.rtl`-файлы корпуса подсвечиваются; RTL внутри
+Python- и Java-строк подсвечивается; универсальный VSIX < 200 КБ.
 
 ### Фаза 1 — сниппеты, тесты грамматики, sync-check (0.1.x; ~1–2 дня)
 

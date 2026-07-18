@@ -196,7 +196,8 @@ vscode-rtl/
    right-to-left-расширениями — находимость строится на полных словах).
    Решение 2026-07-18 (до публикации): displayName «RegTab — Regular Table
    Language» — параллель RegEx = Regular Expression / RegTab = Regular Table;
-   description открывается хуком «RegEx matches text; RegTab matches tables»;
+   description открывается хуком «RegTab matches tables the way RegEx matches
+   text»;
    keywords дополнены «regex», «regular expression», «table patterns», «CSV».
    Имя «RegTab Tools» зарезервировано под будущий extension pack (когда
    инструментов станет больше одного расширения: линтер-плюс, визуальный

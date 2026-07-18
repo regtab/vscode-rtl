@@ -20,8 +20,8 @@ RegTab. Универсальное: обслуживает все реализа
 ## Ключевые факты и инварианты
 
 - **Идентификатор расширения** `regtab.rtl` (displayName «RegTab — Regular Table
-  Language», решение 2026-07-18: ассоциация RegEx↔RegTab, хук «RegEx matches
-  text; RegTab matches tables» в description), publisher `regtab`. После
+  Language», решение 2026-07-18: ассоциация RegEx↔RegTab, хук «RegTab matches
+  tables the way RegEx matches text» в description), publisher `regtab`. После
   публикации id не меняется; displayName менять можно. Имя «RegTab Tools»
   зарезервировано под будущий extension pack (линтер-плюс, визуальный дизайнер),
   для одиночного расширения не использовать.

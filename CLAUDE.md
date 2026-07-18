@@ -19,8 +19,12 @@ RegTab. Универсальное: обслуживает все реализа
 
 ## Ключевые факты и инварианты
 
-- **Идентификатор расширения** `regtab.rtl` (displayName «RegTab RTL»), publisher
-  `regtab`. После публикации id не меняется.
+- **Идентификатор расширения** `regtab.rtl` (displayName «RegTab — Regular Table
+  Language», решение 2026-07-18: ассоциация RegEx↔RegTab, хук «RegEx matches
+  text; RegTab matches tables» в description), publisher `regtab`. После
+  публикации id не меняется; displayName менять можно. Имя «RegTab Tools»
+  зарезервировано под будущий extension pack (линтер-плюс, визуальный дизайнер),
+  для одиночного расширения не использовать.
 - **Нормативная грамматика** — `RTL.g4` (закреплена из jRegTab, копия в pyregtab;
   текущий паритет — jRegTab 0.4.1). Токены RTL **case-insensitive**.
 - **Единый источник истины для tmLanguage** — после фазы 0 этот репозиторий; в

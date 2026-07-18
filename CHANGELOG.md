@@ -5,6 +5,15 @@ The extension follows [semver](https://semver.org) independently of
 jRegTab/pyRegTab versions; the pinned normative grammar version is recorded
 in the README.
 
+## 0.8.3
+
+- Renamed for the Marketplace: displayName is now **«RegTab — Regular Table
+  Language»** (was «RegTab RTL»), the description opens with the positioning
+  hook «RegEx matches text; RegTab matches tables», and `regex` / `regular
+  expression` / `table patterns` / `CSV` joined the keywords. The extension id
+  `regtab.rtl` is unchanged. «RegTab Tools» is reserved as the name of a future
+  extension pack, not of this extension.
+
 ## 0.8.2
 
 - Snippet-style transforms in `rtl.fixtures.input` / `rtl.fixtures.expected`

@@ -194,6 +194,13 @@ vscode-rtl/
    подсветки), `icon.png`, `keywords` — «Regular Table Language», «RegTab», «table
    extraction», «data wrangling», «DSL» (запрос «RTL» в маркетплейсе занят
    right-to-left-расширениями — находимость строится на полных словах).
+   Решение 2026-07-18 (до публикации): displayName «RegTab — Regular Table
+   Language» — параллель RegEx = Regular Expression / RegTab = Regular Table;
+   description открывается хуком «RegEx matches text; RegTab matches tables»;
+   keywords дополнены «regex», «regular expression», «table patterns», «CSV».
+   Имя «RegTab Tools» зарезервировано под будущий extension pack (когда
+   инструментов станет больше одного расширения: линтер-плюс, визуальный
+   дизайнер и т.п.), для одиночного расширения не используется.
 5. Регистрация publisher `regtab` (Azure DevOps + PAT), публикация:
    `vsce publish` + `ovsx publish`.
 6. `pyregtab/ide/` → README-указатель сюда, файлы грамматик удалить (PR в pyregtab).

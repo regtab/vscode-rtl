@@ -1,4 +1,4 @@
-const assert = require("assert");
+﻿const assert = require("assert");
 const fs = require("fs");
 const os = require("os");
 const path = require("path");
@@ -31,8 +31,8 @@ describe("RTL extension smoke", () => {
     await vscode.window.showTextDocument(doc);
     assert.strictEqual(doc.languageId, "rtl");
 
-    const ext = vscode.extensions.getExtension("regtab.rtl");
-    assert.ok(ext, "extension regtab.rtl not found");
+    const ext = vscode.extensions.getExtension("regtab.regtab-rtl");
+    assert.ok(ext, "extension regtab.regtab-rtl not found");
     await waitFor(() => ext.isActive, 15000);
 
     const diags = await waitFor(() => {
@@ -80,7 +80,7 @@ describe("RTL extension smoke", () => {
     assert.strictEqual(view.document.languageId, "rtl");
     const canon = view.document.getText();
     assert.ok(canon.includes("REC"), canon);
-    // Canonicalization drops comments — that is why it is not a formatter.
+    // Canonicalization drops comments вЂ” that is why it is not a formatter.
     assert.ok(!canon.includes("fixture"), canon);
   });
 
@@ -95,7 +95,7 @@ describe("RTL extension smoke", () => {
       "[ [ATTR]{2} ]\n[ [VAL : SC->AVP, SR*->REC] [VAL : SC->AVP] ]+\n"
     );
 
-    const ext = vscode.extensions.getExtension("regtab.rtl");
+    const ext = vscode.extensions.getExtension("regtab.regtab-rtl");
     const api = await ext.activate();
     const ask = (expectedCsv) =>
       api.request("rtl/matchFixture", {

@@ -19,7 +19,9 @@ RegTab. Универсальное: обслуживает все реализа
 
 ## Ключевые факты и инварианты
 
-- **Идентификатор расширения** `regtab.rtl` (displayName «RegTab — Regular Table
+- **Идентификатор расширения** `regtab.regtab-rtl` (переименован 2026-07-19:
+  Marketplace требует глобально уникальную name-часть, «rtl» занят
+  right-to-left-расширением; displayName «RegTab — Regular Table
   Language», решение 2026-07-18: ассоциация RegEx↔RegTab, хук «RegTab matches
   tables the way RegEx matches text» в description), publisher `regtab`. После
   публикации id не меняется; displayName менять можно. Имя «RegTab Tools»

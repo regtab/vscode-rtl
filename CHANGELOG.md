@@ -11,8 +11,9 @@ in the README.
   Language»** (was «RegTab RTL»), the description opens with the positioning
   hook «RegEx matches text; RegTab matches tables», and `regex` / `regular
   expression` / `table patterns` / `CSV` joined the keywords. The extension id
-  `regtab.rtl` is unchanged. «RegTab Tools» is reserved as the name of a future
-  extension pack, not of this extension.
+  is `regtab.regtab-rtl` — the Marketplace requires a globally unique `name`
+  and `rtl` is taken by a right-to-left extension. «RegTab Tools» is reserved
+  as the name of a future extension pack, not of this extension.
 - New icon — the RegTab `][][` mark (rendered from the project's `icon.svg`).
 
 ## 0.8.2

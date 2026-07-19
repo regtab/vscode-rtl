@@ -144,7 +144,7 @@ Marketplace, по образцу rust-analyzer).
 
 ```
 vscode-rtl/
-├── package.json                  # манифест расширения (id: regtab.rtl)
+├── package.json                  # манифест расширения (id: regtab.regtab-rtl)
 ├── language-configuration.json
 ├── README.md                     # = страница в Marketplace
 ├── CHANGELOG.md
@@ -206,7 +206,7 @@ vscode-rtl/
    резервирование имени, публикацией не является), публикация в VS Code
    Marketplace: `vsce publish`.
 6. После публикации: `.vscode/extensions.json` с
-   `"recommendations": ["regtab.rtl"]` в pyregtab и jregtab + коммит их
+   `"recommendations": ["regtab.regtab-rtl"]` в pyregtab и jregtab + коммит их
    каталогов `.vscode/` (там уже лежат `settings.json` с правилами
    `rtl.fixtures.*`, настроенные 2026-07-17/18). До публикации рекомендация
    бессмысленна — Marketplace не найдёт id. Неизвестные ключи настроек и
@@ -445,12 +445,15 @@ PR в pyregtab можно вести параллельно с фазой 1.
 2. **Excel в превью**: MVP — CSV; `calamine` добавить, когда превью докажет ценность
    (стили ячеек — шрифты/выравнивание — в CSV отсутствуют, а `TableSyntax` их
    поддерживает; для паттернов, чувствительных к стилям, Excel станет обязательным).
-3. **Идентификатор расширения** — РЕШЕНО: id `regtab.rtl` (2026-07-11;
-   унаследованный `rtl-language` отвергнут как тавтология «Regular Table
-   Language language»; паттерн — `golang.go`, `rust-lang.rust`,
-   `Prisma.prisma`; name-часть `regtab` не занимаем — общее имя пространства
-   `regtab.*` оставлено будущему extension pack'у). displayName —
-   «RegTab — Regular Table Language» (2026-07-18, см. §5-Ф0 п. 4).
-   Менять id после публикации нельзя, displayName — можно.
+3. **Идентификатор расширения** — РЕШЕНО: id `regtab.regtab-rtl`
+   (2026-07-19; первоначальный `regtab.rtl` от 2026-07-11 оказался
+   недоступен — Marketplace требует **глобально** уникальной name-части,
+   а «rtl» занят right-to-left-расширением, что выяснилось при первой
+   загрузке через портал. Паттерн «publisher повторён в name» обычен:
+   `svelte.svelte-vscode`, `Prisma.prisma`; будущая линейка единообразна —
+   `regtab-designer`, `regtab-tools`. Унаследованный `rtl-language` был
+   отвергнут как тавтология). displayName — «RegTab — Regular Table
+   Language» (2026-07-18, см. §5-Ф0 п. 4). Менять id после публикации
+   нельзя, displayName — можно.
 4. **Где вести issue по языковым фичам** — здесь или в pyregtab? Рекомендация:
    всё редакторское — здесь; компиляторное (span ошибок, пермиссивный режим) — в pyregtab.

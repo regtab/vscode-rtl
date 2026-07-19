@@ -122,10 +122,14 @@ jobs:
         with:
           node-version: 20
 
-      - name: Publish to VS Code Marketplace
+      - name: Publish to VS Code Marketplace (skipped when VSCE_PAT is not set)
         env:
           VSCE_PAT: ${{ secrets.VSCE_PAT }}
         run: |
+          if [ -z "$VSCE_PAT" ]; then
+            echo "VSCE_PAT is not set — skipping the Marketplace, the GitHub Release still gets the VSIXes"
+            exit 0
+          fi
           for f in vsix/*.vsix; do
             npx @vscode/vsce publish --packagePath "$f"
           done

@@ -13,6 +13,7 @@ in the README.
   expression` / `table patterns` / `CSV` joined the keywords. The extension id
   `regtab.rtl` is unchanged. «RegTab Tools» is reserved as the name of a future
   extension pack, not of this extension.
+- New icon — the RegTab `][][` mark (rendered from the project's `icon.svg`).
 
 ## 0.8.2
 

@@ -33,9 +33,12 @@ runtime at all.
   preview re-runs as you edit. Fixtures bind via a `// fixture:` directive
   (paths resolve against the file's directory; `${workspaceFolder}` is
   substituted), the *RTL: Select Fixture…* command, or the
-  `rtl.fixtures.input` glob template for whole directories of patterns. Works on `.rtl` files **and on
-  RTL string literals in Python/Java** (`RtlCompiler.compile`, `@RtlSource`,
-  `language=RTL` markers) via a CodeLens on each literal.
+  `rtl.fixtures.input` glob template for whole directories of patterns
+  (with snippet-style `${basename/regex/replacement/}` transforms for host
+  files whose names don't literally match the fixture layout). Works on
+  `.rtl` files **and on RTL string literals in Python/Java**
+  (`RtlCompiler.compile`, `@RtlSource`, `language=RTL` markers) via a
+  CodeLens on each literal.
 - **Expected-result diff** — bind an expected CSV to a fixture (an
   `// expected:` directive or the `rtl.fixtures.expected` template) and the
   preview turns red/green: it diffs the extracted recordset against the
@@ -72,6 +75,8 @@ runtime at all.
 
 No Python, JDK, or other runtime is required — the extension is fully
 self-contained.
+
+## Embedded RTL at a glance
 
 ### Python
 

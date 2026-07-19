@@ -110,6 +110,8 @@ jobs:
     permissions:
       contents: write
     steps:
+      - uses: actions/checkout@v4
+
       - uses: actions/download-artifact@v4
         with:
           pattern: vsix-*
@@ -143,5 +145,8 @@ jobs:
       - name: GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          files: vsix/*.vsix
+          files: |
+            vsix/*.vsix
+            scripts/install.bat
+            scripts/install.sh
           generate_release_notes: true

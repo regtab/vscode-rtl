@@ -16,6 +16,38 @@ runtime at all.
 [ [VAL: 'AIRPORT'->AVP] [VAL: (COL,ROW,CL)->REC, 'ND'->AVP ' ' VAL: 'MON'->AVP]+ ]+
 ```
 
+## Installation
+
+Until the Marketplace listing is live, install from a VSIX file:
+
+1. Download the package for your platform from
+   [Releases](https://github.com/regtab/vscode-rtl/releases):
+
+   | Your system | File |
+   |---|---|
+   | Windows x64 | `regtab-rtl-<version>-win32-x64.vsix` |
+   | Windows ARM | `regtab-rtl-<version>-win32-arm64.vsix` |
+   | Linux x64 / ARM64 | `…-linux-x64.vsix` / `…-linux-arm64.vsix` |
+   | Alpine Linux | `…-alpine-x64.vsix` |
+   | macOS Intel / Apple Silicon | `…-darwin-x64.vsix` / `…-darwin-arm64.vsix` |
+   | anything else | `…-universal.vsix` (highlighting/snippets only — no bundled language server; point `rtl.server.path` at your own `rtl-lsp` build for the full feature set) |
+
+2. Install it — either from the terminal:
+
+   ```
+   code --install-extension regtab-rtl-<version>-<platform>.vsix
+   ```
+
+   or from the UI: *Extensions* panel → **⋯** menu (top right) →
+   **Install from VSIX…** → pick the file. Reload the window afterwards.
+
+   On Windows you can also drop `scripts/install.bat` next to the
+   downloaded VSIX and double-click it (`scripts/install.sh` for
+   Linux/macOS picks the right file automatically).
+
+A VSIX installed this way does not auto-update — install a newer VSIX over
+it to upgrade (settings and state are kept).
+
 ## Features
 
 - **Compile diagnostics as you type** — powered by `rtl-lsp`, a standalone

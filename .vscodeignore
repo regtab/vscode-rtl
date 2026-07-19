@@ -6,6 +6,7 @@ server/**
 test/**
 tools/**
 plans/**
+scripts/**
 grammar/**
 node_modules/**
 dist/**

@@ -128,10 +128,14 @@ jobs:
             npx @vscode/vsce publish --packagePath "$f"
           done
 
-      - name: Publish to Open VSX
+      - name: Publish to Open VSX (optional — skipped when OVSX_PAT is not set)
         env:
           OVSX_PAT: ${{ secrets.OVSX_PAT }}
         run: |
+          if [ -z "$OVSX_PAT" ]; then
+            echo "OVSX_PAT is not set — skipping Open VSX (plan §5-Ф0 item 7 is optional)"
+            exit 0
+          fi
           for f in vsix/*.vsix; do
             npx ovsx publish "$f"
           done

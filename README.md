@@ -78,6 +78,9 @@ self-contained.
 
 ## Embedded RTL at a glance
 
+Highlighting, diagnostics, and the match preview also work on RTL string
+literals inside host-language code:
+
 ### Python
 
 ```python

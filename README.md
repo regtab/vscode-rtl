@@ -41,10 +41,6 @@ Until the Marketplace listing is live, install from a VSIX file:
    or from the UI: *Extensions* panel → **⋯** menu (top right) →
    **Install from VSIX…** → pick the file. Reload the window afterwards.
 
-   On Windows you can also drop `scripts/install.bat` next to the
-   downloaded VSIX and double-click it (`scripts/install.sh` for
-   Linux/macOS picks the right file automatically).
-
 A VSIX installed this way does not auto-update — install a newer VSIX over
 it to upgrade (settings and state are kept).
 

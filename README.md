@@ -114,7 +114,7 @@ keyword-coverage sync.
 ## Related projects
 
 - [jRegTab](https://github.com/regtab/jregtab) — Java implementation of RegTab.
-- pyRegTab — Python implementation of RegTab (Rust core).
+- [pyRegTab](https://github.com/regtab/pyregtab) — Python implementation of RegTab (Rust core).
 
 ## License
 

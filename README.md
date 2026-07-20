@@ -2,7 +2,7 @@
 
 **RegTab matches tables the way RegEx matches text.** RTL (Regular Table Language)
 is the pattern DSL for extracting structured records from arbitrarily-shaped
-tables, developed by the [RegTab](https://github.com/regtab) project.
+tables, developed by the [RegTab](https://regtab.github.io/) project.
 
 RTL patterns describe the layout of a table (subtables, rows, cells), constrain
 cell content, and specify how matched cells are interpreted into a record set.

@@ -149,6 +149,19 @@ var atp = RtlCompiler.compile("[ [VAL: 'LABEL'->AVP] ]+");
 ![RTL highlighting and a preview CodeLens on a string literal in Python](images/embedded-python.png)
 
 
+## Documentation
+
+- [Binding fixtures and expected results](https://github.com/regtab/vscode-rtl/blob/main/docs/fixtures.md) —
+  the `// fixture:` / `// expected:` directives, the `rtl.fixtures.*`
+  templates with name transforms, input↔expected pairing, comparison
+  semantics, and how the Test Explorer discovers pattern × fixture pairs.
+- [FAQ and behavior notes](https://github.com/regtab/vscode-rtl/blob/main/docs/faq.md) —
+  why there is no formatter, permissive `EXT('…')` handling, embedded-literal
+  limitations, running your own `rtl-lsp`, troubleshooting.
+- [RTL reference](https://github.com/regtab/pyregtab/blob/main/docs/rtl-reference.md) —
+  the language itself: constraints, actions, providers, extractors. The
+  in-editor hover documentation is generated from this document.
+
 ## Roadmap
 
 - Excel fixtures in the preview (cell styles that CSV cannot carry).

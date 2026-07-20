@@ -2,7 +2,7 @@
   "name": "regtab-rtl",
   "displayName": "RegTab - Regular Table Language",
   "description": "RegTab matches tables the way RegEx matches text. RTL (Regular Table Language) is the table-pattern DSL of the RegTab project: syntax highlighting for .rtl files and for RTL embedded in Python and Java string literals, compile diagnostics, live match preview against CSV fixtures, expected-result diffs, and Test Explorer integration.",
-  "version": "0.8.3",
+  "version": "0.8.4",
   "publisher": "regtab",
   "license": "MIT",
   "icon": "icon.png",

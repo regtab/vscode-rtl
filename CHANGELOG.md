@@ -5,6 +5,19 @@ The extension follows [semver](https://semver.org) independently of
 jRegTab/pyRegTab versions; the pinned normative grammar version is recorded
 in the README.
 
+## 0.8.4
+
+- README now shows the extension in action: screenshots of diagnostics,
+  embedded-Python highlighting, the expected-result diff and the Test
+  Explorer, plus an animated GIF of the live match preview.
+- New docs: `docs/fixtures.md` — a complete guide to binding `.rtl` patterns
+  to CSV fixtures and expected results (directives, settings templates,
+  snippet-style transforms); `docs/faq.md` — common questions, linked from
+  the README.
+- Marketplace metadata: the displayName dash is plain ASCII
+  («RegTab - Regular Table Language») and the `regex`-related keywords were
+  dropped to keep the listing focused on table extraction.
+
 ## 0.8.3
 
 - Renamed for the Marketplace: displayName is now **«RegTab — Regular Table

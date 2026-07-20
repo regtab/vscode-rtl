@@ -16,6 +16,7 @@ CLAUDE.md
 .vscodeignore
 *.vsix
 icon.svg
+images/**
 package-lock.json
 **/__pycache__/**
 !dist/extension.js

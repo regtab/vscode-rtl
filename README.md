@@ -16,6 +16,8 @@ runtime at all.
 [ [VAL: 'AIRPORT'->AVP] [VAL: (COL,ROW,CL)->REC, 'ND'->AVP ' ' VAL: 'MON'->AVP]+ ]+
 ```
 
+![Live match preview: colored cell roles and the extracted recordset update as you edit the pattern](images/preview.gif)
+
 ## Installation
 
 Until the Marketplace listing is live, install from a VSIX file:
@@ -55,6 +57,9 @@ it to upgrade (settings and state are kept).
   runtime only at run time). Platform-specific builds bundle the server; on
   other platforms point `rtl.server.path` at your own binary, or use the
   extension with highlighting only.
+
+  ![Compile diagnostics: the error is underlined at the exact source position](images/diagnostics.png)
+
 - **Live match preview** — run the pattern against a CSV fixture: each
   matched cell-derived item's segment is colored by role (VAL / ATTR / AUX)
   inside the cell text, the extracted recordset is shown alongside, and the
@@ -72,10 +77,16 @@ it to upgrade (settings and state are kept).
   preview turns red/green: it diffs the extracted recordset against the
   expected rows (unordered multiset by default; header and row-order
   policies are settings) and lists the missing and extra records.
+
+  ![Expected-result diff: missing and extra records against the expected CSV](images/expected-diff.png)
+
 - **Test Explorer** — every pattern × fixture pair with an expected result
   appears in VS Code's Testing view: run a whole directory of patterns and
   get pass/fail with the diff on failures — regression checks for pattern
   catalogs, no Python or JDK required.
+
+  ![Test Explorer: pattern × fixture pairs with pass/fail results](images/test-explorer.png)
+
 - **Canonical form on demand** — the *RTL: Show Canonical Form* command opens
   a read-only view of the normalized pattern (inherited actions pushed down
   to atoms): see what the compiler actually understood, or compare two
@@ -134,6 +145,9 @@ var atp = RtlCompiler.compile("[ [VAL: 'LABEL'->AVP] ]+");
 
 *(TextMate limitation: the opening quote must be on the same line as
 `RtlCompiler.compile(` / `@RtlSource(`.)*
+
+![RTL highlighting and a preview CodeLens on a string literal in Python](images/embedded-python.png)
+
 
 ## Roadmap
 

@@ -12,6 +12,7 @@ grammar/**
 node_modules/**
 dist/**
 CLAUDE.md
+DEVELOPMENT.md
 .gitignore
 .vscodeignore
 *.vsix

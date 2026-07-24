@@ -5,9 +5,14 @@ The extension follows [semver](https://semver.org) independently of
 jRegTab/pyRegTab versions; the pinned normative grammar version is recorded
 in the README.
 
+## 0.8.6
+
+- Published to the VS Code Marketplace under the extension id `regtab.regtab`.
+- Listing metadata and the README install section updated for the Marketplace.
+
 ## 0.8.5
 
-- First Marketplace release. Renamed the embedded-language grammar files
+- Renamed the embedded-language grammar files
   (`rtl-{python,java}-embedded.tmLanguage.json`) so the package no longer
   contains the word that the Marketplace content filter was blocking; no
   behavior change.
@@ -27,13 +32,13 @@ in the README.
 
 ## 0.8.3
 
-- Renamed for the Marketplace: displayName is now **«RegTab — Regular Table
-  Language»** (was «RegTab RTL»), the description opens with the positioning
-  hook «RegEx matches text; RegTab matches tables», and `regex` / `regular
-  expression` / `table patterns` / `CSV` joined the keywords. The extension id
-  is `regtab.regtab-rtl` — the Marketplace requires a globally unique `name`
-  and `rtl` is taken by a right-to-left extension. «RegTab Tools» is reserved
-  as the name of a future extension pack, not of this extension.
+- Renamed for the Marketplace: displayName **«Regular Table Language (RTL)»**,
+  the description opens with the positioning hook «RegEx matches text; RegTab
+  matches tables», and `regex` / `regular expression` / `table patterns` /
+  `CSV` joined the keywords. The extension id is `regtab.regtab` — the
+  Marketplace requires a globally unique `name` and `rtl` is taken by a
+  right-to-left extension. «RegTab Tools» is reserved as the name of a future
+  extension pack, not of this extension.
 - New icon — the RegTab `][][` mark (rendered from the project's `icon.svg`).
 
 ## 0.8.2

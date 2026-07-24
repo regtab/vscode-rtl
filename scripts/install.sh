@@ -19,13 +19,13 @@ if [ "$target" = "linux-x64" ] && [ -f /etc/alpine-release ]; then
     target=alpine-x64
 fi
 
-vsix=$(ls "$dir"/regtab-rtl-*-"$target".vsix 2>/dev/null | sort | tail -n1 || true)
+vsix=$(ls "$dir"/regtab-*-"$target".vsix 2>/dev/null | sort | tail -n1 || true)
 if [ -z "$vsix" ]; then
-    vsix=$(ls "$dir"/regtab-rtl-*-universal.vsix 2>/dev/null | sort | tail -n1 || true)
+    vsix=$(ls "$dir"/regtab-*-universal.vsix 2>/dev/null | sort | tail -n1 || true)
 fi
 
 if [ -z "$vsix" ]; then
-    echo "No regtab-rtl VSIX for '$target' found next to this script." >&2
+    echo "No regtab VSIX for '$target' found next to this script." >&2
     echo "Download one from https://github.com/regtab/vscode-rtl/releases" >&2
     exit 1
 fi

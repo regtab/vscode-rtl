@@ -19,14 +19,18 @@ RegTab. Универсальное: обслуживает все реализа
 
 ## Ключевые факты и инварианты
 
-- **Идентификатор расширения** `regtab.regtab-rtl` (переименован 2026-07-19:
-  Marketplace требует глобально уникальную name-часть, «rtl» занят
-  right-to-left-расширением; displayName «RegTab — Regular Table
-  Language», решение 2026-07-18: ассоциация RegEx↔RegTab, хук «RegTab matches
-  tables the way RegEx matches text» в description), publisher `regtab`. После
-  публикации id не меняется; displayName менять можно. Имя «RegTab Tools»
-  зарезервировано под будущий extension pack (линтер-плюс, визуальный дизайнер),
-  для одиночного расширения не использовать.
+- **Идентификатор расширения** `regtab.regtab` (name-часть `regtab`), publisher
+  `regtab`, displayName «Regular Table Language (RTL)». История: id
+  `regtab.regtab-rtl` + displayName «RegTab — Regular Table Language» были
+  опубликованы, но **удалены пользователем 2026-07-24** — а удаление в Marketplace
+  **безвозвратно ретейрит и id, и displayName** (оба выдают «already exists /
+  display name is taken»), поэтому пришлось взять новые. Хук «RegTab matches
+  tables the way RegEx matches text» (ассоциация RegEx↔RegTab) сохранён в
+  description. После публикации id неизменен; displayName менять можно (и мы это
+  сделали апдейтом). **Больше листинг не удалять** — сожжёт `regtab` и текущий
+  displayName. Имя «RegTab Tools» зарезервировано под будущий extension pack
+  (линтер-плюс, визуальный дизайнер), для одиночного расширения не использовать.
+  Детали блокировок публикации — [[marketplace-injection-keyword-block]].
 - **Нормативная грамматика** — `RTL.g4` (закреплена из jRegTab, копия в pyregtab;
   текущий паритет — jRegTab 0.4.1). Токены RTL **case-insensitive**.
 - **Единый источник истины для tmLanguage** — после фазы 0 этот репозиторий; в

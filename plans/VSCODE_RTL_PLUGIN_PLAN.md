@@ -144,7 +144,7 @@ Marketplace, по образцу rust-analyzer).
 
 ```
 vscode-rtl/
-├── package.json                  # манифест расширения (id: regtab.regtab-rtl)
+├── package.json                  # манифест расширения (id: regtab.regtab)
 ├── language-configuration.json
 ├── README.md                     # = страница в Marketplace
 ├── CHANGELOG.md
@@ -206,7 +206,7 @@ vscode-rtl/
    резервирование имени, публикацией не является), публикация в VS Code
    Marketplace: `vsce publish`.
 6. После публикации: `.vscode/extensions.json` с
-   `"recommendations": ["regtab.regtab-rtl"]` в pyregtab и jregtab + коммит их
+   `"recommendations": ["regtab.regtab"]` в pyregtab и jregtab + коммит их
    каталогов `.vscode/` (там уже лежат `settings.json` с правилами
    `rtl.fixtures.*`, настроенные 2026-07-17/18). До публикации рекомендация
    бессмысленна — Marketplace не найдёт id. Неизвестные ключи настроек и
@@ -445,15 +445,17 @@ PR в pyregtab можно вести параллельно с фазой 1.
 2. **Excel в превью**: MVP — CSV; `calamine` добавить, когда превью докажет ценность
    (стили ячеек — шрифты/выравнивание — в CSV отсутствуют, а `TableSyntax` их
    поддерживает; для паттернов, чувствительных к стилям, Excel станет обязательным).
-3. **Идентификатор расширения** — РЕШЕНО: id `regtab.regtab-rtl`
-   (2026-07-19; первоначальный `regtab.rtl` от 2026-07-11 оказался
-   недоступен — Marketplace требует **глобально** уникальной name-части,
-   а «rtl» занят right-to-left-расширением, что выяснилось при первой
-   загрузке через портал. Паттерн «publisher повторён в name» обычен:
-   `svelte.svelte-vscode`, `Prisma.prisma`; будущая линейка единообразна —
-   `regtab-designer`, `regtab-tools`. Унаследованный `rtl-language` был
-   отвергнут как тавтология). displayName — «RegTab — Regular Table
-   Language» (2026-07-18, см. §5-Ф0 п. 4). Менять id после публикации
-   нельзя, displayName — можно.
+3. **Идентификатор расширения** — РЕШЕНО: id `regtab.regtab` (name-часть
+   `regtab`), displayName «Regular Table Language (RTL)». Эволюция: `regtab.rtl`
+   (2026-07-11) → недоступен («rtl» занят right-to-left-расширением) →
+   `regtab.regtab-rtl` (2026-07-19) — опубликован, затем удалён пользователем
+   2026-07-24. Удаление в Marketplace **безвозвратно ретейрит id И displayName**,
+   поэтому потребовались новые: `regtab.regtab` + «Regular Table Language (RTL)».
+   Паттерн «publisher повторён в name» обычен (`svelte.svelte-vscode`,
+   `Prisma.prisma`); будущая линейка — `regtab-designer`, `regtab-tools`.
+   Менять id после публикации нельзя, displayName — можно; **листинг больше не
+   удалять** (сожжёт `regtab`). Первый паблиш нового id прошёл только минимальными
+   метаданными (строгий first-publish-фильтр), полные метаданные вернули
+   апдейтом — см. §5-Ф0 п. 4 и заметку про injection-блокер.
 4. **Где вести issue по языковым фичам** — здесь или в pyregtab? Рекомендация:
    всё редакторское — здесь; компиляторное (span ошибок, пермиссивный режим) — в pyregtab.

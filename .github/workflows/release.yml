@@ -80,7 +80,7 @@ jobs:
           mkdir -p bin
           cp "server/target/${{ matrix.rust_target }}/release/rtl-lsp${{ matrix.exe }}" bin/
           npx vsce package --target ${{ matrix.vsce_target }} \
-            -o "regtab-rtl-${{ github.ref_name }}-${{ matrix.vsce_target }}.vsix"
+            -o "regtab-${{ github.ref_name }}-${{ matrix.vsce_target }}.vsix"
 
       - uses: actions/upload-artifact@v4
         with:
@@ -98,7 +98,7 @@ jobs:
       - name: Package universal VSIX (no server binary)
         run: |
           npm ci
-          npx vsce package -o regtab-rtl-${{ github.ref_name }}-universal.vsix
+          npx vsce package -o regtab-${{ github.ref_name }}-universal.vsix
       - uses: actions/upload-artifact@v4
         with:
           name: vsix-universal

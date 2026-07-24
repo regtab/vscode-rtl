@@ -10,15 +10,15 @@ set "VSIX="
 rem Prefer the platform package, fall back to the universal one.
 if defined PROCESSOR_ARCHITECTURE (
     if /i "%PROCESSOR_ARCHITECTURE%"=="ARM64" (
-        for %%F in ("%DIR%regtab-rtl-*-win32-arm64.vsix") do set "VSIX=%%~fF"
+        for %%F in ("%DIR%regtab-*-win32-arm64.vsix") do set "VSIX=%%~fF"
     ) else (
-        for %%F in ("%DIR%regtab-rtl-*-win32-x64.vsix") do set "VSIX=%%~fF"
+        for %%F in ("%DIR%regtab-*-win32-x64.vsix") do set "VSIX=%%~fF"
     )
 )
-if not defined VSIX for %%F in ("%DIR%regtab-rtl-*-universal.vsix") do set "VSIX=%%~fF"
+if not defined VSIX for %%F in ("%DIR%regtab-*-universal.vsix") do set "VSIX=%%~fF"
 
 if not defined VSIX (
-    echo No regtab-rtl VSIX found next to this script.
+    echo No regtab VSIX found next to this script.
     echo Download one from https://github.com/regtab/vscode-rtl/releases
     exit /b 1
 )

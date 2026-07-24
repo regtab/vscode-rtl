@@ -31,8 +31,8 @@ describe("RTL extension smoke", () => {
     await vscode.window.showTextDocument(doc);
     assert.strictEqual(doc.languageId, "rtl");
 
-    const ext = vscode.extensions.getExtension("regtab.regtab-rtl");
-    assert.ok(ext, "extension regtab.regtab-rtl not found");
+    const ext = vscode.extensions.getExtension("regtab.regtab");
+    assert.ok(ext, "extension regtab.regtab not found");
     await waitFor(() => ext.isActive, 15000);
 
     const diags = await waitFor(() => {
@@ -95,7 +95,7 @@ describe("RTL extension smoke", () => {
       "[ [ATTR]{2} ]\n[ [VAL : SC->AVP, SR*->REC] [VAL : SC->AVP] ]+\n"
     );
 
-    const ext = vscode.extensions.getExtension("regtab.regtab-rtl");
+    const ext = vscode.extensions.getExtension("regtab.regtab");
     const api = await ext.activate();
     const ask = (expectedCsv) =>
       api.request("rtl/matchFixture", {

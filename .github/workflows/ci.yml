@@ -40,18 +40,18 @@ jobs:
           JREGTAB_TOKEN: ${{ secrets.JREGTAB_TOKEN }}
 
       - name: Package universal VSIX
-        run: npx vsce package -o regtab-rtl.vsix
+        run: npx vsce package -o regtab.vsix
 
       - name: Check universal VSIX size (< 200 KB)
         run: |
-          size=$(stat -c%s regtab-rtl.vsix)
+          size=$(stat -c%s regtab.vsix)
           echo "VSIX size: $size bytes"
           test "$size" -lt 204800
 
       - uses: actions/upload-artifact@v4
         with:
-          name: regtab-rtl-vsix
-          path: regtab-rtl.vsix
+          name: regtab-vsix
+          path: regtab.vsix
 
   # rtl-lsp: cargo tests over the conformance corpus, then the e2e smoke
   # against a real VS Code with the freshly built server bundled in bin/.

@@ -5,6 +5,13 @@ The extension follows [semver](https://semver.org) independently of
 jRegTab/pyRegTab versions; the pinned normative grammar version is recorded
 in the README.
 
+## 0.8.5
+
+- First Marketplace release. Renamed the embedded-language grammar files
+  (`rtl-{python,java}-embedded.tmLanguage.json`) so the package no longer
+  contains the word that the Marketplace content filter was blocking; no
+  behavior change.
+
 ## 0.8.4
 
 - README now shows the extension in action: screenshots of diagnostics,

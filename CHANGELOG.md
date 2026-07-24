@@ -5,6 +5,13 @@ The extension follows [semver](https://semver.org) independently of
 jRegTab/pyRegTab versions; the pinned normative grammar version is recorded
 in the README.
 
+## 0.8.7
+
+- Platform-specific builds that bundle the `rtl-lsp` language server (win32,
+  linux, alpine and darwin — x64/arm64), so compile diagnostics and the live
+  match preview work out of the box. The universal package (highlighting and
+  snippets only) stays as the fallback for other platforms.
+
 ## 0.8.6
 
 - Published to the VS Code Marketplace under the extension id `regtab.regtab`.

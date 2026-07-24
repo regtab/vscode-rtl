@@ -120,7 +120,7 @@ in the README.
   works as for `.rtl` files — a `// fixture:` directive inside the literal,
   a remembered per-literal choice, or `rtl.fixtures.input` (now matched
   against the host file, `${basename}` = host file name).
-- Known limitations (same as the highlighting injections): the opening quote
+- Known limitations (same as the embedded-highlighting grammars): the opening quote
   must be on the same line as the trigger; string concatenation and f-strings
   are not recognized.
 
@@ -188,7 +188,7 @@ Initial release (grammar parity: jRegTab 0.4.1).
 
 - Syntax highlighting for `.rtl` files (TextMate grammar moved here from
   `pyregtab/ide/vscode/`; this repository is now its canonical home).
-- Injection grammars: RTL inside Python string literals
+- Embedded-language grammars: RTL inside Python string literals
   (`RtlCompiler.compile(…)`) and Java string literals/text blocks
   (`RtlCompiler.compile(…)`, `@RtlSource(…)`, `/* language=RTL */` marker).
 - Language configuration: brackets, auto-closing pairs, `//` comments.

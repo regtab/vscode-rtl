@@ -58,7 +58,7 @@
       },
       {
         "scopeName": "inline.rtl-python",
-        "path": "./syntaxes/rtl-python-injection.tmLanguage.json",
+        "path": "./syntaxes/rtl-python-embedded.tmLanguage.json",
         "injectTo": [
           "source.python"
         ],
@@ -69,7 +69,7 @@
       },
       {
         "scopeName": "inline.rtl-java",
-        "path": "./syntaxes/rtl-java-injection.tmLanguage.json",
+        "path": "./syntaxes/rtl-java-embedded.tmLanguage.json",
         "injectTo": [
           "source.java"
         ],

@@ -152,8 +152,8 @@ vscode-rtl/
 ├── icon.png                      # 128×128
 ├── syntaxes/
 │   ├── rtl.tmLanguage.json
-│   ├── rtl-python-injection.tmLanguage.json
-│   └── rtl-java-injection.tmLanguage.json
+│   ├── rtl-python-embedded.tmLanguage.json
+│   └── rtl-java-embedded.tmLanguage.json
 ├── snippets/rtl.json
 ├── client/                       # TypeScript (esbuild-бандл)
 │   ├── src/extension.ts          # активация, LanguageClient, команды

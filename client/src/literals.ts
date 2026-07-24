@@ -3,7 +3,7 @@
  * functions — no vscode imports — so the logic is unit-testable outside the
  * extension host.
  *
- * Triggers mirror the injection grammars: `RtlCompiler.compile(…)` in Python
+ * Triggers mirror the embedded-language grammars: `RtlCompiler.compile(…)` in Python
  * and Java, `@RtlSource(…)` and the `language=RTL` block-comment marker in
  * Java. Inherited limitations: the opening quote must be on the trigger's
  * line; concatenation and f-strings are out of scope. */

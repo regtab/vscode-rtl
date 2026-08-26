@@ -55,7 +55,7 @@
   "Settings prefix": {
     "prefix": "settings",
     "body": "<NORM, ANCH(${1:1})>",
-    "description": "Table pattern settings: normalization and anchor column"
+    "description": "Table pattern settings: normalization and anchor attribute position"
   },
   "Conditional cell": {
     "prefix": "condcell",

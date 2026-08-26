@@ -21,6 +21,13 @@ sources: RtlTask001..150 + curated extras
 | `task_116.rtl` | `positive/` | фрагменты, `PREFIX`, диапазон `R1..3` |
 | `ext_unbound_cell.rtl` | `negative/` | токенизация `EXT('…')` (семантически невалиден — для LSP-тестов фазы 2; здесь только подсветка) |
 | `settings_unknown.rtl` | `negative/` | токенизация настроек `<…>` |
+| `anch_named_attrs.rtl` | `semantic/` | настройка `<ANCH(n)>`, `COL->AVP`, именованная схема |
+| `anch_named_inline_delim.rtl` | `semantic/` | инлайновый `REC(n)` внутри делимитированной спеки `{','}` |
+
+Два кейса из `semantic/` приехали с корпусом, перепиненным на jRegTab 0.5.1
+(pyRegTab 0.5.1): их `pattern.rtl` — единственные в наборе, где встречаются
+настоящая настройка `<ANCH(n)>` и делимитированная спецификация `{','}`.
+Сам `conformance/VERSION` при этом не менялся, поэтому блок выше актуален.
 
 Снапшоты (`*.snap`) генерируются `npm run test:grammar:update`; при изменении
 tmLanguage диф снапшотов ревьюится как часть PR.

@@ -22,7 +22,7 @@ use tower_lsp::{Client, LanguageServer, LspService, Server};
 
 /// Version of the normative RTL grammar the bundled compiler implements.
 /// Reported in the `initialize` response (plan §6).
-const GRAMMAR_VERSION: &str = "RTL grammar jRegTab 0.5.0";
+const GRAMMAR_VERSION: &str = "RTL grammar jRegTab 0.5.1";
 const DEBOUNCE: Duration = Duration::from_millis(150);
 
 #[derive(Default)]

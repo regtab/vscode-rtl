@@ -4,7 +4,7 @@
 (`pyregtab/conformance/`) без правок. Версия корпуса (его `VERSION`):
 
 ```
-generated: 2026-07-07
+generated: 2026-08-26
 sources: RtlTask001..150 + curated extras
 ```
 

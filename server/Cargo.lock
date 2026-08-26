@@ -435,8 +435,8 @@ dependencies = [
 
 [[package]]
 name = "pyregtab"
-version = "0.5.0"
-source = "git+https://github.com/regtab/pyregtab.git?tag=v0.5.0#abca0c7f27040c0186adb98d5bdb64f5154e83c8"
+version = "0.5.1"
+source = "git+https://github.com/regtab/pyregtab.git?tag=v0.5.1#0eb6ea50e660699be107ebfdc6fd1ed2efb5220e"
 dependencies = [
  "indexmap",
  "regex",

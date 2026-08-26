@@ -5,6 +5,21 @@ The extension follows [semver](https://semver.org) independently of
 jRegTab/pyRegTab versions; the pinned normative grammar version is recorded
 in the README.
 
+## 0.8.8
+
+- Language server pinned to pyRegTab `v0.5.0` instead of tracking `main`, so
+  RTL execution semantics can no longer change under the extension between
+  builds.
+- pyRegTab 0.5.0 changes the delimited content specification `(VAL){","}`:
+  tokens are passed through verbatim — surrounding whitespace is kept and
+  empty tokens derive items. Trimming is opt-in via `(VAL=TRIM){","}`. The
+  match preview now shows empty items as a zero-width marker instead of
+  silently omitting them.
+- Hover text for the `TRIM` and `NORM` extractors now says what each one
+  actually does.
+- Grammar pin and corpus references updated to jRegTab 0.5.0 (`RTL.g4` itself
+  is unchanged).
+
 ## 0.8.7
 
 - Platform-specific builds that bundle the `rtl-lsp` language server (win32,

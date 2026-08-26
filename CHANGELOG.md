@@ -13,8 +13,10 @@ in the README.
 - pyRegTab 0.5.0 changes the delimited content specification `(VAL){","}`:
   tokens are passed through verbatim — surrounding whitespace is kept and
   empty tokens derive items. Trimming is opt-in via `(VAL=TRIM){","}`. The
-  match preview now shows empty items as a zero-width marker instead of
-  silently omitting them.
+  match preview now marks empty items with a slim coloured bar in the item's
+  role colour instead of silently omitting them.
+- Item tooltips in the match preview show the extracted string again — an
+  unescaped quote used to truncate every tooltip right after the arrow.
 - Hover text for the `TRIM` and `NORM` extractors now says what each one
   actually does.
 - Grammar pin and corpus references updated to jRegTab 0.5.0 (`RTL.g4` itself

@@ -176,7 +176,14 @@ function render(r: MatchFixtureResult, fixtureName: string): string {
   .value { background: rgba(64, 160, 64, 0.35); border-radius: 2px; }
   .attribute { background: rgba(64, 128, 224, 0.35); border-radius: 2px; }
   .auxiliary { background: rgba(224, 160, 32, 0.35); border-radius: 2px; }
-  .empty { display: inline-block; width: 3px; height: 1em; vertical-align: text-bottom; }
+  /* An empty item has no glyph to carry the role colour, so the 0.35 alpha
+     used for text runs leaves the marker at ~1.5:1 against the background.
+     Give the marker the role colour at full opacity — same legend, readable
+     in both themes. */
+  .empty { display: inline-block; width: 4px; height: 1em; vertical-align: text-bottom; }
+  .value.empty { background: rgb(64, 160, 64); }
+  .attribute.empty { background: rgb(64, 128, 224); }
+  .auxiliary.empty { background: rgb(224, 160, 32); }
   .unmatched, .filler { opacity: 0.6; }
   .banner { padding: 4px 8px; margin: 4px 0; border-radius: 3px; }
   .ok { background: rgba(64, 160, 64, 0.2); }

@@ -56,7 +56,7 @@ After a cell match condition, `?` separates the condition from the content speci
 Context-derived provider: a constant attribute–value pair."),
     ("ANCH", "**Setting `ANCH(n)`**
 
-Use position *n* in the first record as the attribute name for all records"),
+Move the anchor attribute to 0-based position *n* in the schema"),
     ("ATTR", "**Item derivation directive `ATTR`**
 
 Attribute-associated item"),
@@ -156,7 +156,7 @@ Trim + collapse internal whitespace"),
 
 `()->REC` — Anchor item → single-field record (no additional providers; useful after `SUFFIX`/`PREFIX`/`FILL` has enriched the anchor value)
 
-`prov->REC(n)` — Same + use attribute at position *n* as the record's attribute name
+`prov->REC(n)` — Same + move the anchor attribute (name with its values) to position *n*
 
 `prov->REC('s')` — Same + split field values by delimiter *s*"),
     ("REPL", "**String extractor `REPL(\"a\",\"b\")`**

@@ -5,6 +5,23 @@ The extension follows [semver](https://semver.org) independently of
 jRegTab/pyRegTab versions; the pinned normative grammar version is recorded
 in the README.
 
+## 0.8.9
+
+- Language server pinned to pyRegTab `v0.5.1`, which fixes `ANCH(n)` and
+  `REC(n)`: the transformation now moves the anchor attribute itself — its
+  name together with its values — so patterns that name attributes through
+  `AVP` keep every record's name-value pairs and only the schema order
+  changes. Previously the column carrying the anchor's name received another
+  attribute's values, and the match preview showed that wrong header.
+- On an anonymous schema the values and their positions are unchanged, but
+  the `$a_i` names now travel with their attributes instead of being
+  renumbered, so a four-attribute schema under `ANCH(2)` reads
+  `$a_2, $a_3, $a_1, $a_4` in the preview header.
+- Hover text for the `ANCH` setting and the `REC(n)` action now describes the
+  move instead of the old "use as the attribute name" wording.
+- Grammar pin and corpus references updated to jRegTab 0.5.1 (`RTL.g4` itself
+  is unchanged).
+
 ## 0.8.8
 
 - Language server pinned to pyRegTab `v0.5.0` instead of tracking `main`, so

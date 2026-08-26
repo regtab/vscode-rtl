@@ -134,7 +134,7 @@ Apply whitespace normalisation to all field values after extraction
 
 **String extractor `NORM`**
 
-Collapse whitespace"),
+Trim + collapse internal whitespace"),
     ("P", "**Positional constraint `P…` (position-in-record)**
 
 `Pn` — `index == n`
@@ -194,7 +194,7 @@ Substring starting at position *n*, length *m*"),
 `prov->SUFFIX(' ')` — Append provider value to anchor, separated by *s*"),
     ("TRIM", "**String extractor `TRIM`**
 
-Trim"),
+Strip leading/trailing whitespace only"),
     ("UC", "**String extractor `UC`**
 
 To upper case"),

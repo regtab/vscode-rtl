@@ -424,6 +424,36 @@ mod tests {
         assert!(res.cells.iter().any(|c| c.role == "value" && c.row > 0));
     }
 
+    /// `AVP` names the attributes and `<ANCH(1)>` moves the anchor attribute --
+    /// its name together with its values -- so the preview header follows the
+    /// table's own column order and every value stays under its own name.
+    /// Mirrors pyregtab's conformance case `semantic/anch_named_attrs`.
+    #[test]
+    fn anchor_setting_moves_the_named_attribute_with_its_values() {
+        let grid = vec![
+            vec!["Dato".into(), "Lokaler".into(), "Klasse".into()],
+            vec!["20.05".into(), "AU".into(), "0".into()],
+            vec!["11.06".into(), "A2.1".into(), "1".into()],
+        ];
+        let res = run(
+            "<ANCH(1)>\n[ [ATTR]+ ]\n[ COL->AVP [VAL] [VAL: ROW*->REC] [VAL] ]+",
+            &grid,
+        )
+        .unwrap();
+        assert!(res.matched, "{:?}", res.error);
+        // Extraction is anchor-first, so the raw schema is Lokaler, Dato,
+        // Klasse; ANCH(1) moves the Lokaler *attribute* to index 1, which
+        // restores the table's column order.
+        assert_eq!(res.schema, vec!["Dato", "Lokaler", "Klasse"]);
+        assert_eq!(
+            res.records,
+            vec![
+                vec![Some("20.05".into()), Some("AU".into()), Some("0".into())],
+                vec![Some("11.06".into()), Some("A2.1".into()), Some("1".into())],
+            ]
+        );
+    }
+
     #[test]
     fn compound_cell_yields_per_item_spans() {
         let grid = vec![vec!["0 Jan".into()]];

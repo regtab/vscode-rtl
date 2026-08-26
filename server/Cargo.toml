@@ -15,8 +15,9 @@ path = "src/main.rs"
 # semantics are part of the extension's contract, and a floating `main` would
 # change preview behaviour between builds with no signal at all (which is
 # exactly what happened with `S_delim` in pyregtab 0.5.0). Bumping the version
-# is an explicit edit of this line — see plans/PYREGTAB_050_SYNC.md.
-pyregtab = { git = "https://github.com/regtab/pyregtab.git", tag = "v0.5.0", default-features = false }
+# is an explicit edit of this line — see plans/PYREGTAB_050_SYNC.md and
+# plans/PYREGTAB_051_SYNC.md.
+pyregtab = { git = "https://github.com/regtab/pyregtab.git", tag = "v0.5.1", default-features = false }
 tower-lsp = "0.20"
 tokio = { version = "1", features = ["rt-multi-thread", "io-std", "macros", "time", "sync"] }
 csv = "1"

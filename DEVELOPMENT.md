@@ -12,7 +12,7 @@
 
 `rtl-lsp` использует чистое Rust-ядро pyregtab
 (`default-features = false` — без pyo3). Зависимость — **git-пин на
-релизный тег** (`server/Cargo.toml`, сейчас `v0.5.0`), конкретный коммит
+релизный тег** (`server/Cargo.toml`, сейчас `v0.5.1`), конкретный коммит
 зафиксирован в `server/Cargo.lock`. Соседний checkout pyregtab для сборки
 **не нужен** — ни локально, ни в CI; cargo выкачивает ядро сам.
 

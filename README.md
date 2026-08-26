@@ -156,7 +156,7 @@ var atp = RtlCompiler.compile("[ [VAL: 'LABEL'->AVP] ]+");
 
 ## Grammar version
 
-Highlighting mirrors the normative RTL grammar `RTL.g4` from **jRegTab 0.5.0**
+Highlighting mirrors the normative RTL grammar `RTL.g4` from **jRegTab 0.5.1**
 (RTL tokens are case-insensitive). Any change to the normative grammar must be
 accompanied by a matching tmLanguage update in this repository — CI enforces
 keyword-coverage sync.

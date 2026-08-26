@@ -10,12 +10,13 @@ name = "rtl-lsp"
 path = "src/main.rs"
 
 [dependencies]
-# The pure-Rust RTL compiler core (plan §3.2). Interim: a sibling-checkout
-# path dependency on pyregtab main (CI checks it out next to this
-# repository). Switch to the planned pinned git dependency
-# (`git = "https://github.com/regtab/pyregtab.git", tag = "v0.4.0"`) once
-# pyregtab releases a version containing the `python` feature split.
-pyregtab = { path = "../../pyregtab", default-features = false }
+# The pure-Rust RTL compiler core (compiler, matcher, interpreter) from
+# pyRegTab, pinned to a release tag. The pin is deliberate: RTL execution
+# semantics are part of the extension's contract, and a floating `main` would
+# change preview behaviour between builds with no signal at all (which is
+# exactly what happened with `S_delim` in pyregtab 0.5.0). Bumping the version
+# is an explicit edit of this line — see plans/PYREGTAB_050_SYNC.md.
+pyregtab = { git = "https://github.com/regtab/pyregtab.git", tag = "v0.5.0", default-features = false }
 tower-lsp = "0.20"
 tokio = { version = "1", features = ["rt-multi-thread", "io-std", "macros", "time", "sync"] }
 csv = "1"

@@ -11,13 +11,31 @@
 ## Зависимость от pyregtab
 
 `rtl-lsp` использует чистое Rust-ядро pyregtab
-(`default-features = false` — без pyo3). Пока пререквизитная работа
-(cargo-фича `python`, `compile_permissive`, позиции ошибок) живёт в main
-pyregtab и не выпущена релизом, зависимость — **path**
-на соседний checkout: `../../pyregtab` (его main должен быть
-выкачан). CI раскладывает репозитории так же (checkout pyregtab рядом).
-После релиза pyregtab с этой работой зависимость переключается на
-закреплённый git-тег (план §3.2).
+(`default-features = false` — без pyo3). Зависимость — **git-пин на
+релизный тег** (`server/Cargo.toml`, сейчас `v0.5.0`), конкретный коммит
+зафиксирован в `server/Cargo.lock`. Соседний checkout pyregtab для сборки
+**не нужен** — ни локально, ни в CI; cargo выкачивает ядро сам.
+
+Пин принципиален: семантика исполнения RTL — часть контракта расширения,
+и плавающий `main` менял бы поведение preview между сборками без единого
+сигнала (так и вышло с `S_delim` в pyregtab 0.5.0).
+
+Соседний checkout `../pyregtab` остаётся нужен **только** для
+`tools/gen_hover_data.py` — генератор читает
+`../pyregtab/docs/rtl-reference.md`.
+
+### Обновление версии ядра
+
+1. поднять `tag` в `server/Cargo.toml`;
+2. `cargo build` в `server/` — пересобрать `Cargo.lock`, закоммитить его
+   вместе с `Cargo.toml`;
+3. прогнать `cargo clippy --all-targets -- -D warnings` и `cargo test`;
+4. перегенерировать hover-словарь: `python tools/gen_hover_data.py`
+   (нужен свежий соседний checkout pyregtab на том же теге);
+5. если сдвинулись грамматика или conformance-корпус — обновить
+   `grammar/UPSTREAM`, `test/grammar/fixtures/CORPUS.md` и README;
+6. проверить `CHANGELOG.md`: смена семантики исполнения видна пользователю
+   и должна быть описана.
 
 На Windows с тулчейном `x86_64-pc-windows-gnu`: если сборка падает с
 «error calling dlltool», проверьте, что `parking_lot_core` закреплён на

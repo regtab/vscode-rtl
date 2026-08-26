@@ -50,12 +50,6 @@ jobs:
         with:
           path: vscode-rtl
 
-      - uses: actions/checkout@v4
-        with:
-          repository: regtab/pyregtab
-          ref: main
-          path: pyregtab
-
       - uses: dtolnay/rust-toolchain@stable
         with:
           targets: ${{ matrix.rust_target }}

@@ -36,10 +36,16 @@ RegTab. Универсальное: обслуживает все реализа
 - **Единый источник истины для tmLanguage** — после фазы 0 этот репозиторий; в
   `pyregtab/ide/` и `jregtab/ide/` остаются только указатели. Изменение `RTL.g4`
   в upstream-проектах требует синхронной правки грамматик здесь (CI: sync-check).
-- **`rtl-lsp`** (фаза 2+) — автономный Rust-бинарь на tower-lsp поверх ядра pyregtab
-  (git-зависимость `default-features = false`). Пререквизит в pyregtab ещё НЕ сделан:
-  cargo-фича `python` (гейтинг pyo3), `compile_permissive` (заглушки `EXT('…')`),
-  span ошибок. Без пермиссивного режима валидные `.rtl` с `EXT` дают ложные ошибки.
+- **`rtl-lsp`** — автономный Rust-бинарь на tower-lsp поверх ядра pyregtab:
+  git-зависимость, **закреплённая на релизный тег** (сейчас `v0.5.0`,
+  `default-features = false` — без pyo3), коммит зафиксирован в
+  `server/Cargo.lock`. Соседний checkout pyregtab для сборки не нужен (нужен
+  только генератору hover). Пин обязателен: семантика исполнения RTL — часть
+  контракта расширения, плавающий `main` уже менял поведение preview молча
+  (`S_delim` в 0.5.0). Обновление тега — осознанная правка `server/Cargo.toml`
+  по процедуре из DEVELOPMENT.md. Пререквизиты ядра выпущены: фича `python`
+  (гейтинг pyo3, с 0.4.0), `compile_permissive` (заглушки `EXT('…')`), span
+  ошибок.
 - **Находимость в Marketplace**: запрос «RTL» занят right-to-left-расширениями —
   в названиях/keywords использовать «Regular Table Language», «RegTab»,
   «table extraction».

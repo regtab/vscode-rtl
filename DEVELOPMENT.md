@@ -1,114 +1,114 @@
-# Разработка
+# Development
 
-## Состав
+## Components
 
-| Слой | Где | Сборка |
+| Layer | Location | Build |
 |---|---|---|
-| Декларативный (грамматики, сниппеты) | `syntaxes/`, `snippets/`, `language-configuration.json` | не требуется |
-| TS-клиент | `client/src/extension.ts` | `npm run build:client` (esbuild → `dist/extension.js`) |
-| LSP-сервер `rtl-lsp` | `server/` (Rust, tower-lsp) | `cargo build --release` в `server/` |
+| Declarative (grammars, snippets) | `syntaxes/`, `snippets/`, `language-configuration.json` | Not required |
+| TypeScript client | `client/src/extension.ts` | `npm run build:client` (esbuild → `dist/extension.js`) |
+| LSP server `rtl-lsp` | `server/` (Rust, tower-lsp) | `cargo build --release` in `server/` |
 
-## Зависимость от pyregtab
+## pyregtab dependency
 
-`rtl-lsp` использует чистое Rust-ядро pyregtab
-(`default-features = false` — без pyo3). Зависимость — **git-пин на
-релизный тег** (`server/Cargo.toml`, сейчас `v0.5.1`), конкретный коммит
-зафиксирован в `server/Cargo.lock`. Соседний checkout pyregtab для сборки
-**не нужен** — ни локально, ни в CI; cargo выкачивает ядро сам.
+`rtl-lsp` uses the pure Rust core of pyregtab
+(`default-features = false` — without pyo3). The dependency is a **git pin to a
+release tag** (`server/Cargo.toml`, currently `v0.5.1`), with the exact commit
+recorded in `server/Cargo.lock`. An adjacent pyregtab checkout is **not required**
+for local or CI builds; cargo downloads the core itself.
 
-Пин принципиален: семантика исполнения RTL — часть контракта расширения,
-и плавающий `main` менял бы поведение preview между сборками без единого
-сигнала (так и вышло с `S_delim` в pyregtab 0.5.0).
+The pin is essential: RTL execution semantics are part of the extension contract,
+and a floating `main` would change preview behavior between builds without any
+explicit signal (as occurred with `S_delim` in pyregtab 0.5.0).
 
-Соседний checkout `../pyregtab` остаётся нужен **только** для
-`tools/gen_hover_data.py` — генератор читает
+The adjacent `../pyregtab` checkout is required **only** by
+`tools/gen_hover_data.py`, which reads
 `../pyregtab/docs/rtl-reference.md`.
 
-### Обновление версии ядра
+### Updating the core version
 
-1. поднять `tag` в `server/Cargo.toml`;
-2. `cargo build` в `server/` — пересобрать `Cargo.lock`, закоммитить его
-   вместе с `Cargo.toml`;
-3. прогнать `cargo clippy --all-targets -- -D warnings` и `cargo test`;
-4. перегенерировать hover-словарь: `python tools/gen_hover_data.py`
-   (нужен свежий соседний checkout pyregtab на том же теге);
-5. если сдвинулись грамматика или conformance-корпус — обновить
-   `grammar/UPSTREAM`, `test/grammar/fixtures/CORPUS.md` и README;
-6. проверить `CHANGELOG.md`: смена семантики исполнения видна пользователю
-   и должна быть описана.
+1. Update `tag` in `server/Cargo.toml`.
+2. Run `cargo build` in `server/` to regenerate `Cargo.lock`; commit it
+   together with `Cargo.toml`.
+3. Run `cargo clippy --all-targets -- -D warnings` and `cargo test`.
+4. Regenerate the hover dictionary: `python tools/gen_hover_data.py`
+   (an up-to-date adjacent pyregtab checkout at the same tag is required).
+5. If the grammar or conformance corpus changed, update
+   `grammar/UPSTREAM`, `test/grammar/fixtures/CORPUS.md`, and the README.
+6. Review `CHANGELOG.md`: changes to execution semantics are user-visible
+   and must be documented.
 
-На Windows с тулчейном `x86_64-pc-windows-gnu`: если сборка падает с
-«error calling dlltool», проверьте, что `parking_lot_core` закреплён на
-0.9.9 в `server/Cargo.lock` (raw-dylib новых версий требует dlltool,
-которого нет в rust-mingw по умолчанию).
+On Windows with the `x86_64-pc-windows-gnu` toolchain, if the build fails with
+“error calling dlltool”, verify that `parking_lot_core` is pinned to
+0.9.9 in `server/Cargo.lock` (raw-dylib in newer versions requires dlltool,
+which rust-mingw does not provide by default).
 
-## Тесты
+## Tests
 
-- `npm test` — типы клиента, снапшоты грамматики, юнит-тесты клиента
-  (извлечение литералов, привязка фикстур/expected), sync-check с `RTL.g4`.
-- `cd server && cargo test` — юнит-тесты диагностики, канонизации и
-  expected-сравнения + conformance-корпус (позитив: ноль диагностик;
-  негатив: точные позиции; `ext_unbound_*` обязаны компилироваться в
-  пермиссивном режиме).
-- `npm run test:e2e` — смоук через `@vscode/test-electron`: расширение
-  активируется, сервер поднимается, битый `.rtl` даёт диагностику,
-  канонизация открывает read-only-вид, expected-diff считается end-to-end,
-  ошибка в Python-литерале подчёркивается в хост-координатах
-  (нужен собранный бинарь в `bin/`).
+- `npm test` — client type checking, grammar snapshots, and client unit tests
+  (literal extraction, fixture/expected binding), plus the `RTL.g4` sync check.
+- `cd server && cargo test` — unit tests for diagnostics, canonicalization, and
+  expected-result comparison, plus the conformance corpus (positive cases: zero diagnostics;
+  negative cases: exact positions; `ext_unbound_*` must compile in
+  permissive mode).
+- `npm run test:e2e` — smoke tests via `@vscode/test-electron`: the extension
+  activates, the server starts, an invalid `.rtl` file produces a diagnostic,
+  canonicalization opens a read-only view, expected diff is computed end-to-end,
+  and an error in a Python literal is highlighted at host coordinates
+  (a built binary in `bin/` is required).
 
-## Сборка VSIX
+## Building VSIX packages
 
-- Универсальный (только подсветка): `npx vsce package` при **пустом** `bin/`.
-- Платформенный: положить `rtl-lsp(.exe)` в `bin/`, затем
-  `npx vsce package --target win32-x64` (и т.д. — список таргетов в
+- Universal (syntax highlighting only): run `npx vsce package` with an **empty** `bin/`.
+- Platform-specific: place `rtl-lsp(.exe)` in `bin/`, then run
+  `npx vsce package --target win32-x64` (and so on; see the target list in
   `release.yml`).
 
-## Публикация
+## Publishing
 
-Только вручную и только с явного одобрения владельца (каждый раз). Ниже —
-уроки первой публикации (2026-07-24); соблюдать их, чтобы не повторять грабли.
+Manual publishing only, with the owner's explicit approval each time. The following
+lessons from the initial publication (2026-07-24) must be observed to avoid repeating past issues.
 
-### Каналы
+### Channels
 
-- **Ручная загрузка через портал** marketplace.visualstudio.com/manage — **PAT
-  не нужен** (вход по Microsoft-аккаунту). Основной путь, пока нет Azure DevOps
-  организации для токена.
-- **`release.yml` по тегу `v*`** — собирает 7 платформенных VSIX + universal и
-  создаёт GitHub Release. Публикацию в Marketplace/Open VSX **пропускает**, если
-  нет секретов `VSCE_PAT`/`OVSX_PAT`. Без PAT это удобный **сборщик**: тегнул →
-  скачал VSIX из Release → залил вручную через портал.
+- **Manual upload through the portal** at marketplace.visualstudio.com/manage — **no PAT
+  is required** (sign in with a Microsoft account). This is the primary method until an Azure DevOps
+  organization is available for token issuance.
+- **`release.yml` on a `v*` tag** — builds seven platform-specific VSIX packages plus a universal one and
+  creates a GitHub Release. Marketplace/Open VSX publishing is **skipped** if
+  the `VSCE_PAT`/`OVSX_PAT` secrets are absent. Without PATs, this serves as a convenient **build pipeline**: push a tag →
+  download the VSIX from the Release → upload it manually through the portal.
 
-### Фильтр «suspicious content» (первая публикация строже обновлений)
+### “Suspicious content” filter (initial publication is stricter than updates)
 
-- Сканирует **текст** метаданных (displayName, description, keywords, README) и
-  **имена файлов** — не бинарник и не подпись (VirusTotal-чистота не помогает).
-  Триггерят «горячие» слова; у нас это было **`injection`** в именах грамматик
-  (→ переименованы в `*-embedded`; штатный ключ `injectionSelector` внутри не
-  триггерит).
-- Первая публикация нового id проверяется жёстко, **обновления — мягко**. Рабочая
-  схема: **первый паблиш — минимальными метаданными** (короткое description, 1
-  keyword; полный функционал/`contributes` можно оставить; бинарник лучше не
-  вкладывать — nobin universal), затем ⋯ → **Update** поднимает версию с полными
-  description+keywords и платформенными бинарниками.
-- При отказе — бисекция: залить максимально нейтральный VSIX и возвращать поля по
-  одному (failed-загрузки ничего не резервируют, повторять безопасно).
+- It scans metadata **text** (displayName, description, keywords, README) and
+  **file names**, not binaries or signatures (a clean VirusTotal result does not help).
+  Certain high-risk words trigger it; in this project, the trigger was **`injection`** in grammar file names
+  (hence the rename to `*-embedded`; the standard `injectionSelector` key inside a file does not
+  trigger it).
+- The initial publication of a new id is checked strictly, while **updates receive less scrutiny**. Recommended
+  procedure: **publish initially with minimal metadata** (short description, one
+  keyword; full functionality/`contributes` may remain; preferably omit the binary
+  and publish a universal package without `bin/`), then use ⋯ → **Update** to release a version with complete
+  description+keywords and platform-specific binaries.
+- If rejected, use bisection: upload the most neutral VSIX possible and restore fields
+  one at a time (failed uploads reserve nothing and are safe to repeat).
 
-### Идентичность необратима
+### Identity is irreversible
 
-- `name` в манифесте должен быть **глобально** уникален (не только пара
-  publisher.name): `rtl` занят right-to-left-расширением. После публикации id
-  неизменен; displayName менять можно (апдейтом).
-- **Удалять листинг нельзя.** Delete безвозвратно ретейрит И id, И displayName
-  (оба затем выдают «already exists / display name is taken»). Так были сожжены
-  `regtab-rtl` и «RegTab - Regular Table Language». «Начать с чистого листа» =
-  обновлять, а не удалять.
+- `name` in the manifest must be **globally** unique (not merely unique within a
+  publisher.name): `rtl` is occupied by a right-to-left extension. The id is immutable
+  after publication; displayName can be changed through an update.
+- **Never delete the listing.** Delete permanently retires BOTH the id AND displayName
+  (both subsequently report “already exists / display name is taken”). This permanently retired
+  `regtab-rtl` and “RegTab - Regular Table Language”. Starting afresh means
+  updating the listing, not deleting it.
 
-### Заливка VSIX
+### Uploading VSIX packages
 
-- Новый VSIX в существующее расширение — ⋯ → **Update** (не «New extension»),
-  версия строго выше предыдущей.
-- Платформенные пакеты: у каждого свой `TargetPlatform` в манифесте (ставит
-  `vsce package --target <t>`); заливаются все под одной версией, Marketplace
-  группирует по Id+Version и раздаёт нужный (universal без `TargetPlatform` —
-  fallback). Между файлами ждать обновления публичной страницы не надо — только
-  чтобы портал **принял** предыдущий файл; верификация и CDN обновляются в фоне.
+- To upload a new VSIX to an existing extension, use ⋯ → **Update** (not “New extension”),
+  with a version strictly greater than the previous one.
+- Each platform package has its own `TargetPlatform` in the manifest (set by
+  `vsce package --target <t>`); upload all packages under the same version. Marketplace
+  groups them by Id+Version and serves the appropriate one (the universal package without `TargetPlatform` is the
+  fallback). There is no need to wait for the public page to refresh between uploads — only
+  until the portal **accepts** the previous file; verification and CDN updates run in the background.

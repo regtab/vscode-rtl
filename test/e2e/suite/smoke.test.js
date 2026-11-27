@@ -1,4 +1,4 @@
-﻿const assert = require("assert");
+const assert = require("assert");
 const fs = require("fs");
 const os = require("os");
 const path = require("path");
@@ -80,7 +80,7 @@ describe("RTL extension smoke", () => {
     assert.strictEqual(view.document.languageId, "rtl");
     const canon = view.document.getText();
     assert.ok(canon.includes("REC"), canon);
-    // Canonicalization drops comments вЂ” that is why it is not a formatter.
+    // Canonicalization drops comments — that is why it is not a formatter.
     assert.ok(!canon.includes("fixture"), canon);
   });
 

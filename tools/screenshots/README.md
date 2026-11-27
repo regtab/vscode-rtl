@@ -1,43 +1,43 @@
-# Скриншоты и GIF для README
+# Screenshots and GIF for the README
 
-Кадры в `images/` сняты автоматически (2026-07-20, VS Code 1.100.0 из
-`.vscode-test`, дисплей 200% → всё в чётком 2x) скриптами из этой папки;
-в `.vsix` каталог `images/` не попадает
-(`.vscodeignore`), Marketplace подтягивает их из GitHub по перезаписанным
-`vsce` ссылкам — поэтому перед публикацией снимки должны быть запушены.
+The captures in `images/` were generated automatically (2026-07-20, VS Code 1.100.0 from
+`.vscode-test`, 200% display scaling → crisp 2x output) by the scripts in this directory.
+The `images/` directory is excluded from the `.vsix`
+by `.vscodeignore`; Marketplace loads the images from GitHub through links rewritten
+by `vsce`, so the captures must be pushed before publication.
 
-## Как это устроено
+## How it works
 
-1. **Демо-workspace** (см. «Материал» ниже) с настроенными
-   `rtl.fixtures.input/expected` и пятью паттернами из data-wrangling-eval.
-2. **Запуск**: `Code.exe --extensionDevelopmentPath=<репо>
-   --user-data-dir=<чистый> --disable-extensions --remote-debugging-port=9333
-   <workspace>` (свежий user-data-dir с `workbench.colorTheme: "Default Dark
-   Modern"`, `window.zoomLevel: 0`, минимум хрома — см. историю).
-3. **Управление** — `tools/screenshots/driver.mjs` (CDP по порту 9333, без
-   зависимостей): команды `palette`, `quickopen`, `keys`, `click`, `dblclick`,
-   `wheel`, `type`, `shot`. Размер окна — `tools/screenshots/win.ps1`
-   (SetWindowPos, физические пиксели).
-4. **GIF** — `gifrec.mjs` пишет кадры (screenshot-луп ~350 мс) во время
-   сценария «{2} → дабл-клик → 3 → превью перерисовалось», `assemble.mjs`
-   (нужны `npm i gifenc pngjs`) собирает `preview.gif` с 2x-даунскейлом.
-   Известная грабля: `rawKeyDown` в CDP не выполняет Backspace/выделение —
-   заменять текст только через `dblclick` + `Input.insertText`.
+1. **Demo workspace** (see “Assets” below) with configured
+   `rtl.fixtures.input/expected` and five patterns from data-wrangling-eval.
+2. **Launch**: `Code.exe --extensionDevelopmentPath=<repo>
+   --user-data-dir=<clean> --disable-extensions --remote-debugging-port=9333
+   <workspace>` (a fresh user-data-dir with `workbench.colorTheme: "Default Dark
+   Modern"`, `window.zoomLevel: 0`, and minimal UI chrome; see the history).
+3. **Control** — `tools/screenshots/driver.mjs` (CDP over port 9333, no
+   dependencies): commands `palette`, `quickopen`, `keys`, `click`, `dblclick`,
+   `wheel`, `type`, `shot`. Window size is managed by `tools/screenshots/win.ps1`
+   (SetWindowPos, physical pixels).
+4. **GIF** — `gifrec.mjs` captures frames (an approximately 350 ms screenshot loop) during
+   the “{2} → double-click → 3 → preview redraws” scenario; `assemble.mjs`
+   (requires `npm i gifenc pngjs`) assembles `preview.gif` with 2x downscaling.
+   Known issue: CDP `rawKeyDown` does not perform Backspace/selection operations;
+   replace text only through `dblclick` + `Input.insertText`.
 
-## Кадры
+## Captures
 
-| Файл | Что в кадре | Материал |
+| File | Content | Assets |
 |---|---|---|
-| `preview.gif` | Hero: правка квантификатора `{2}`→`{3}`, превью перерисовывается — рваные записи с ∅ становятся чистым recordset | синтетический `quarterly.rtl` + `quarterly.csv` (город × квартал, структура task_026) с `// fixture:` директивой |
-| `diagnostics.png` | Squiggle на ошибке + Problems «expected cell match constraint…» | вариант task_018 с опечаткой (`->AVP` без провайдера) |
-| `expected-diff.png` | «✗ Recordset differs… — 1 missing, 1 extra», секции Missing/Extra | task_026, в expected_1.csv одно значение заменено |
-| `test-explorer.png` | Testing view: 24/25, раскрытый красный узел, паттерн справа | 5 задач × 5 фикстур из data-wrangling-eval |
-| `embedded-python.png` | RTL-подсветка в `RtlCompiler.compile("""…""")` + CodeLens | синтетический `extract.py` с паттерном task_036 |
+| `preview.gif` | Hero: editing the quantifier `{2}`→`{3}` redraws the preview — ragged records containing ∅ become a clean recordset | Synthetic `quarterly.rtl` + `quarterly.csv` (city × quarter, task_026 structure) with a `// fixture:` directive |
+| `diagnostics.png` | Squiggle on an error + Problems entry “expected cell match constraint…” | Variant of task_018 with a typo (`->AVP` without a provider) |
+| `expected-diff.png` | “✗ Recordset differs… — 1 missing, 1 extra”, Missing/Extra sections | task_026, with one value changed in expected_1.csv |
+| `test-explorer.png` | Testing view: 24/25, expanded red node, pattern on the right | 5 tasks × 5 fixtures from data-wrangling-eval |
+| `embedded-python.png` | RTL highlighting in `RtlCompiler.compile("""…""")` + CodeLens | Synthetic `extract.py` with the task_036 pattern |
 
-## Материал
+## Assets
 
-Демо-workspace собирается из `d:\YandexDisk\code2\data-wrangling-eval`:
-`solutions/regtab/task_{013,018,023,026,036}.rtl` + их `fixtures/`, настройки:
+The demo workspace is assembled from `d:\YandexDisk\code2\data-wrangling-eval`:
+`solutions/regtab/task_{013,018,023,026,036}.rtl` + their `fixtures/`, with these settings:
 
 ```json
 {
@@ -49,5 +49,5 @@
 }
 ```
 
-Для красного теста — испортить одно значение в копии `expected_1.csv`
-task_026. Оригиналы фикстур не трогать.
+For the failing test, change one value in a copy of `expected_1.csv` for
+task_026. Do not modify the original fixtures.

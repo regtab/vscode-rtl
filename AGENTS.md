@@ -1,68 +1,68 @@
 # vscode-rtl
 
-Расширение VS Code для RTL (Regular Table Language) — DSL паттернов таблиц проекта
-RegTab. Универсальное: обслуживает все реализации RegTab (jRegTab, pyRegTab, будущие),
-не требуя у пользователя ни Python, ни JDK.
+VS Code extension for RTL (Regular Table Language), a DSL for table patterns in the
+RegTab project. It is implementation-independent: it supports all RegTab implementations
+(jRegTab, pyRegTab, and future ones) without requiring Python or a JDK on the user's machine.
 
-**Дорожная карта — `plans/VSCODE_RTL_PLUGIN_PLAN.md`.** Реализация идёт по его фазам
-(0: перенос подсветки и публикация → 1: сниппеты/тесты грамматики → 2: LSP-диагностика →
-3: языковые фичи → 4: превью матчинга). Прежде чем менять архитектурные решения,
-сверяйся с планом; изменение решения = правка плана в том же PR.
+**Roadmap: `plans/VSCODE_RTL_PLUGIN_PLAN.md`.** Implementation follows its phases
+(0: migrate and publish syntax highlighting → 1: snippets/grammar tests → 2: LSP diagnostics →
+3: language features → 4: match preview). Consult the plan before changing architectural
+decisions; every such change must update the plan in the same PR.
 
-## Связанные проекты (локальные пути)
+## Related projects (local paths)
 
-| Проект | Путь | Что берём |
+| Project | Path | What we use |
 |---|---|---|
-| pyRegTab | `d:\YandexDisk\code2\pyregtab` | Прототип расширения `ide/vscode/` (tmLanguage `.rtl`, Python-инъекция, language-configuration, package.json); нормативная грамматика `grammar/RTL.g4`; Rust-ядро компилятора `src/rtl/*` (база будущего `rtl-lsp`); conformance-корпус `conformance/{positive,negative}` (тестовые `.rtl`); справочник `docs/rtl-reference.md` (источник hover-контента и сниппетов); `tools/check_grammar_sync.py` |
-| jRegTab | `d:\YandexDisk\code2\jregtab` | Происхождение нормативной `RTL.g4`; готовая Java-инъекция `ide/vscode/syntaxes/rtl-java-injection.tmLanguage.json`; свой `ide/README.md` |
-| data-wrangling-eval | `d:\YandexDisk\code2\data-wrangling-eval` | Реальный пример standalone-использования `.rtl`: решения `solutions/regtab/task_NNN.rtl`, данные `fixtures/task_NNN/{input_k.csv, expected_k.csv, task_match_options.json}` — эталонный сценарий для превью и `rtl.fixtures.*` |
+| pyRegTab | `d:\YandexDisk\code2\pyregtab` | Extension prototype `ide/vscode/` (tmLanguage `.rtl`, Python injection, language-configuration, package.json); normative grammar `grammar/RTL.g4`; Rust compiler core `src/rtl/*` (the foundation for `rtl-lsp`); conformance corpus `conformance/{positive,negative}` (`.rtl` test files); reference guide `docs/rtl-reference.md` (source for hover content and snippets); `tools/check_grammar_sync.py` |
+| jRegTab | `d:\YandexDisk\code2\jregtab` | Origin of the normative `RTL.g4`; ready-made Java injection `ide/vscode/syntaxes/rtl-java-injection.tmLanguage.json`; its own `ide/README.md` |
+| data-wrangling-eval | `d:\YandexDisk\code2\data-wrangling-eval` | Real-world example of standalone `.rtl` usage: solutions `solutions/regtab/task_NNN.rtl`, data `fixtures/task_NNN/{input_k.csv, expected_k.csv, task_match_options.json}` — the reference scenario for preview and `rtl.fixtures.*` |
 
-## Ключевые факты и инварианты
+## Key facts and invariants
 
-- **Идентификатор расширения** `regtab.regtab` (name-часть `regtab`), publisher
-  `regtab`, displayName «Regular Table Language (RTL)». История: id
-  `regtab.regtab-rtl` + displayName «RegTab — Regular Table Language» были
-  опубликованы, но **удалены пользователем 2026-07-24** — а удаление в Marketplace
-  **безвозвратно ретейрит и id, и displayName** (оба выдают «already exists /
-  display name is taken»), поэтому пришлось взять новые. Хук «RegTab matches
-  tables the way RegEx matches text» (ассоциация RegEx↔RegTab) сохранён в
-  description. После публикации id неизменен; displayName менять можно (и мы это
-  сделали апдейтом). **Больше листинг не удалять** — сожжёт `regtab` и текущий
-  displayName. Имя «RegTab Tools» зарезервировано под будущий extension pack
-  (линтер-плюс, визуальный дизайнер), для одиночного расширения не использовать.
-  Детали блокировок публикации — [[marketplace-injection-keyword-block]].
-- **Нормативная грамматика** — `RTL.g4` (закреплена из jRegTab, копия в pyregtab;
-  текущий паритет — jRegTab 0.5.1). Токены RTL **case-insensitive**.
-- **Единый источник истины для tmLanguage** — после фазы 0 этот репозиторий; в
-  `pyregtab/ide/` и `jregtab/ide/` остаются только указатели. Изменение `RTL.g4`
-  в upstream-проектах требует синхронной правки грамматик здесь (CI: sync-check).
-- **`rtl-lsp`** — автономный Rust-бинарь на tower-lsp поверх ядра pyregtab:
-  git-зависимость, **закреплённая на релизный тег** (сейчас `v0.5.1`,
-  `default-features = false` — без pyo3), коммит зафиксирован в
-  `server/Cargo.lock`. Соседний checkout pyregtab для сборки не нужен (нужен
-  только генератору hover). Пин обязателен: семантика исполнения RTL — часть
-  контракта расширения, плавающий `main` уже менял поведение preview молча
-  (`S_delim` в 0.5.0). Обновление тега — осознанная правка `server/Cargo.toml`
-  по процедуре из DEVELOPMENT.md. Пререквизиты ядра выпущены: фича `python`
-  (гейтинг pyo3, с 0.4.0), `compile_permissive` (заглушки `EXT('…')`), span
-  ошибок.
-- **Находимость в Marketplace**: запрос «RTL» занят right-to-left-расширениями —
-  в названиях/keywords использовать «Regular Table Language», «RegTab»,
-  «table extraction».
-- Канонизация через `AtpToRtlSerializer` — нормализация, не стилевой форматтер
-  (наследуемые действия опускаются на уровень атомов). Реализована **только** как
-  read-only-команда «RTL: Show Canonical Form» (решение 2026-07-17): сериализация
-  теряет комментарии (в т.ч. `// fixture:`), поэтому форматтера/format-on-save
-  нет и не будет.
+- **Extension identifier** `regtab.regtab` (name component `regtab`), publisher
+  `regtab`, displayName “Regular Table Language (RTL)”. History: id
+  `regtab.regtab-rtl` + displayName “RegTab — Regular Table Language” were
+  published but **deleted by the user on 2026-07-24**. Marketplace deletion
+  **permanently retires both the id and displayName** (both subsequently report “already exists /
+  display name is taken”), so new ones were required. The tagline “RegTab matches
+  tables the way RegEx matches text” (the RegEx↔RegTab association) is retained in
+  description. The id is immutable after publication; displayName can be changed (and was
+  changed in an update). **Never delete the listing again** — doing so would permanently retire `regtab` and the current
+  displayName. The name “RegTab Tools” is reserved for a future extension pack
+  (advanced linter, visual designer) and must not be used for a single extension.
+  Publication blocking details: [[marketplace-injection-keyword-block]].
+- **Normative grammar** — `RTL.g4` (pinned from jRegTab, with a copy in pyregtab;
+  currently at parity with jRegTab 0.5.1). RTL tokens are **case-insensitive**.
+- **Single source of truth for tmLanguage** — this repository since phase 0;
+  `pyregtab/ide/` and `jregtab/ide/` contain only pointers. Changing `RTL.g4`
+  in upstream projects requires synchronized grammar updates here (CI: sync-check).
+- **`rtl-lsp`** — a standalone Rust binary built with tower-lsp on the pyregtab core:
+  a git dependency **pinned to a release tag** (currently `v0.5.1`,
+  `default-features = false` — without pyo3), with the commit recorded in
+  `server/Cargo.lock`. No adjacent pyregtab checkout is required for building (only
+  the hover generator needs one). The pin is mandatory: RTL execution semantics are part
+  of the extension contract, and a floating `main` has already silently changed preview behavior
+  (`S_delim` in 0.5.0). Update the tag only through a deliberate `server/Cargo.toml` change
+  following the procedure in DEVELOPMENT.md. Core prerequisites have been released: the `python`
+  feature (pyo3 gating, since 0.4.0), `compile_permissive` (`EXT('…')` stubs), and error
+  spans.
+- **Marketplace discoverability**: the query “RTL” is dominated by right-to-left extensions;
+  use “Regular Table Language”, “RegTab”, and
+  “table extraction” in names/keywords.
+- Canonicalization via `AtpToRtlSerializer` is normalization, not stylistic formatting
+  (inherited actions are expanded at the atom level). It is implemented **only** as the
+  read-only command “RTL: Show Canonical Form” (decision of 2026-07-17): serialization
+  discards comments (including `// fixture:`), so no formatter/format-on-save
+  exists or will be added.
 
-## Соглашения
+## Conventions
 
-- Документы (планы, README разделов) — на русском; код, идентификаторы, тексты
-  UI расширения и страница Marketplace — на английском.
-- Тестовые `.rtl` копируются из conformance-корпуса pyregtab с фиксацией его версии
-  (`conformance/VERSION`), не редактируются вручную.
-- Коммиты/релизы: semver расширения независим от версий jRegTab/pyRegTab; версия
-  грамматики фиксируется в README и в ответе `initialize` сервера.
-- **Публикация в Marketplace/Open VSX — только с явного одобрения пользователя**
-  (каждый раз): не запускать `vsce publish`/`ovsx publish` и не пушить теги `v*`
-  (release.yml публикует) самостоятельно.
+- Documentation (including README sections), code, identifiers, extension UI text, and the
+  Marketplace page are in English. Documents under `plans/` remain in Russian.
+- Test `.rtl` files are copied from the pyregtab conformance corpus with its version recorded
+  (`conformance/VERSION`) and must not be edited manually.
+- Commits/releases: extension semver is independent of jRegTab/pyRegTab versions; the grammar
+  version is recorded in the README and the server's `initialize` response.
+- **Publishing to Marketplace/Open VSX requires explicit user approval**
+  every time: never run `vsce publish`/`ovsx publish` or push `v*` tags
+  (release.yml performs publishing) autonomously.

@@ -98,7 +98,7 @@ Platform-specific builds include the server. On other platforms, set
   annotation, Java 15+ text blocks (`"""…"""`), and literals marked with
   `/* language=RTL */`.
 - **Snippets** for frequently used combinations: `ST*->REC`, `(SC{n}, SR)->REC(n)`,
-  `^COL->AVP`, `('LABEL')->AVP`, `CL->JOIN(0)`, `-AV->PREFIX(', ')`, table and
+  `^COL->AVP`, `('LABEL')->AVP`, `CL->CONCAT(0)`, `-AV->PREFIX(', ')`, table and
   fragment skeletons, settings, and conditional cells.
 - **Editor basics** — bracket matching, auto-closing pairs for `[] {} () <>`,
   and `//` line comments.
@@ -159,7 +159,7 @@ var atp = RtlCompiler.compile("[ [VAL: 'LABEL'->AVP] ]+");
 
 ## Grammar version
 
-Highlighting mirrors the normative RTL grammar `RTL.g4` from **jRegTab 0.5.1**
+Highlighting mirrors the normative RTL grammar `RTL.g4` from **jRegTab 0.7.1**
 (RTL tokens are case-insensitive). Any change to the normative grammar must be
 accompanied by a corresponding TextMate grammar update in this repository;
 CI enforces keyword coverage.

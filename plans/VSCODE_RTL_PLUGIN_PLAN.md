@@ -226,7 +226,7 @@ Python- и Java-строк подсвечивается; универсальн�
 ### Фаза 1 — сниппеты, тесты грамматики, sync-check (0.1.x; ~1–2 дня)
 
 1. `snippets/rtl.json` по разделу «Frequently used combinations» справочника:
-   `ST*->REC`, `(SC{n}, SR)->REC(n)`, `^COL->AVP`, `('LABEL')->AVP`, `CL->JOIN(0)`,
+   `ST*->REC`, `(SC{n}, SR)->REC(n)`, `^COL->AVP`, `('LABEL')->AVP`, `CL->CONCAT(0)`,
    `-AV->PREFIX(', ')`, каркасы `[ [VAL] [VAL : …]+ ]+`, объявление `$FRAG=[…]`,
    настройки `<NORM, ANCH(n)>`, условная ячейка `[cond ? _ | VAL]`.
 2. Снапшот-тесты грамматики (`vscode-tmgrammar-test`) на выборке из

@@ -19,10 +19,10 @@
     "body": "('${1:LABEL}')->AVP",
     "description": "Associate with a constant string attribute"
   },
-  "Join same-cell item": {
-    "prefix": "cljoin",
-    "body": "CL->JOIN(${1:0})",
-    "description": "Join (drop anchor) another item from the same cell"
+  "Concatenate same-cell item": {
+    "prefix": "clconcat",
+    "body": "CL->CONCAT(${1:0})",
+    "description": "Concatenate (drop anchor) another item from the same cell"
   },
   "Fill forward from same column": {
     "prefix": "colfill",

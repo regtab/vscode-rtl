@@ -17,7 +17,7 @@ path = "src/main.rs"
 # exactly what happened with `S_delim` in pyregtab 0.5.0). Bumping the version
 # is an explicit edit of this line — see plans/PYREGTAB_050_SYNC.md and
 # plans/PYREGTAB_051_SYNC.md.
-pyregtab = { git = "https://github.com/regtab/pyregtab.git", tag = "v0.5.1", default-features = false }
+pyregtab = { git = "https://github.com/regtab/pyregtab.git", tag = "v0.7.4", default-features = false }
 tower-lsp = "0.20"
 tokio = { version = "1", features = ["rt-multi-thread", "io-std", "macros", "time", "sync"] }
 csv = "1"

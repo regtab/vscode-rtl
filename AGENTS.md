@@ -36,13 +36,13 @@ same PR.
   must not be used for a single extension. Publication blocking details:
   [[marketplace-injection-keyword-block]].
 - **Normative grammar** — `RTL.g4` (pinned from jRegTab, with a copy in pyRegTab;
-  currently at parity with jRegTab 0.5.1). RTL tokens are **case-insensitive**.
+  currently at parity with jRegTab 0.7.1). RTL tokens are **case-insensitive**.
 - **Single source of truth for TextMate grammars** — this repository since
   phase 0; `pyregtab/ide/` and `jregtab/ide/` contain only pointers. Changing
   `RTL.g4` in upstream projects requires synchronized grammar updates here
   (CI: `check:sync`).
 - **`rtl-lsp`** — a standalone Rust binary built with tower-lsp and the pyRegTab
-  core: a git dependency **pinned to a release tag** (currently `v0.5.1`,
+  core: a git dependency **pinned to a release tag** (currently `v0.7.4`,
   `default-features = false` — without `pyo3`), with the commit recorded in
   `server/Cargo.lock`. No adjacent pyRegTab checkout is required for building;
   only the hover generator needs one. The pin is mandatory: RTL execution

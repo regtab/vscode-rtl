@@ -12,7 +12,7 @@
 
 `rtl-lsp` uses the pure Rust core of pyRegTab
 (`default-features = false`, which disables `pyo3`). The dependency is a **git
-pin to a release tag** (`server/Cargo.toml`, currently `v0.5.1`), with the exact
+pin to a release tag** (`server/Cargo.toml`, currently `v0.7.4`), with the exact
 commit recorded in `server/Cargo.lock`. An adjacent pyRegTab checkout is **not
 required** for local or CI builds; Cargo downloads the core itself.
 

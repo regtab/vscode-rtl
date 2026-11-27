@@ -18,7 +18,7 @@ Named fragment: declared in the preamble (`$N=[…]` / `$N={…}`), referenced a
 
 `+` — 1 or more
 
-`{n}` — exactly *n*
+`{n}` — exactly *n* (*n* ≥ 0; `{1}` is the same as no quantifier, `{0}` matches nothing, i.e. an empty match)
 
 Provider cardinality:
 
@@ -33,7 +33,7 @@ Provider cardinality:
 
 `+` — 1 or more
 
-`{n}` — exactly *n*"),
+`{n}` — exactly *n* (*n* ≥ 0; `{1}` is the same as no quantifier, `{0}` matches nothing, i.e. an empty match)"),
     ("->", "**Action arrow `providers->OP`**
 
 Applies the interpretation action `OP` to the anchor item, with candidate items supplied by the providers."),
@@ -48,7 +48,7 @@ Positional range: `C1..3`, `R+1..`, `P0..2`. An open end (`a..`) is unbounded.")
 
 `+` — 1 or more
 
-`{n}` — exactly *n*
+`{n}` — exactly *n* (*n* ≥ 0; `{1}` is the same as no quantifier, `{0}` matches nothing, i.e. an empty match)
 
 After a cell match condition, `?` separates the condition from the content specification."),
     ("@", "**Constant AVP `@'ATTR'='VALUE'`**
@@ -96,6 +96,11 @@ Candidate cells relative to the anchor *a*: `same_cell(a)`"),
     ("COL", "**Spatial constraint `COL`**
 
 Candidate cells relative to the anchor *a*: `same_col(a) && !same_cell(a)`"),
+    ("CONCAT", "**Interpretation action `CONCAT`**
+
+`prov->CONCAT` — Concatenate the provided records to the anchor's record — one wide record, the provided anchors are removed (K=∅: all items included)
+
+`prov->CONCAT(0)`, `prov->CONCAT(0, 'A')` — Same, with the key K not repeated: dropped from each concatenated record, and all records must agree there (e.g. `CONCAT(0)` drops the anchor of each concatenated record). K lists key **positions** (0-based) and/or key **attribute names** (string literals, resolved per record). A named attribute shared by two records (apart from the key) is an error: the action has no effect and a diagnostic is reported"),
     ("EXT", "**Content constraint `EXT('name')`**
 
 `Python item filter bound under `name` — see [External Python bindings](#external-python-bindings-extname)`
@@ -114,9 +119,9 @@ Provider constraint (`(ROW & EXT('n'))->REC`) → **Bindings.filter(name, …)**
 `prov->FILL('/')` — Fill anchor value forward from provider, separated by *s*"),
     ("JOIN", "**Interpretation action `JOIN`**
 
-`prov->JOIN` — Join item-based records: all items included, then dedup by named attribute (K=∅)
+`prov->JOIN` — Record product: every record of the anchor is combined with every provided record (cross product); the provided anchors are joined-away. A named attribute shared by two records acts as a natural-join condition
 
-`prov->JOIN(0)` — Join with key positions K dropped from each joined record before dedup (e.g. `JOIN(0)` drops the anchor position)"),
+`prov->JOIN(0)`, `prov->JOIN('Year')` — Equi-join on the key K (positions and/or attribute names): a record pair is combined only if it agrees at K, the key of the joined record is not repeated"),
     ("LC", "**String extractor `LC`**
 
 To lower case"),
@@ -219,7 +224,7 @@ No item derived (cell is consumed but ignored)"),
 
 `+` — 1 or more
 
-`{n}` — exactly *n*
+`{n}` — exactly *n* (*n* ≥ 0; `{1}` is the same as no quantifier, `{0}` matches nothing, i.e. an empty match)
 
 Provider cardinality:
 

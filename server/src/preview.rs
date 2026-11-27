@@ -237,16 +237,15 @@ fn run(pattern: &str, grid: &[Vec<String>]) -> Result<MatchFixtureResult, String
         }
     })?;
 
-    let mut syntax = SyntaxCore::new(grid.len(), grid[0].len())
-        .map_err(|_| "empty table".to_string())?;
+    let mut syntax =
+        SyntaxCore::new(grid.len(), grid[0].len()).map_err(|_| "empty table".to_string())?;
     for (r, row) in grid.iter().enumerate() {
         for (c, text) in row.iter().enumerate() {
             syntax.cell_mut(r, c).set_text(text.clone());
         }
     }
 
-    let sem = match_atp(&atp, &mut syntax, Vec::new())
-        .map_err(|e| err_text(&e))?;
+    let sem = match_atp(&atp, &mut syntax, Vec::new()).map_err(|e| err_text(&e))?;
     let Some(sem) = sem else {
         return Ok(MatchFixtureResult::default()); // matched: false
     };
@@ -262,9 +261,12 @@ fn run(pattern: &str, grid: &[Vec<String>]) -> Result<MatchFixtureResult, String
                 ItemType::Attribute => "attribute",
                 ItemType::Auxiliary => "auxiliary",
             },
-            index: it.index,
-            s: it.s.clone(),
-            span: byte_span_to_chars(&grid[it.row][it.col], it.span),
+            index: it.index as usize,
+            s: it.s.to_string(),
+            span: byte_span_to_chars(
+                &grid[it.row][it.col],
+                (it.span.0 as usize, it.span.1 as usize),
+            ),
             tags: it.tags.clone(),
         })
         .collect();
@@ -273,13 +275,22 @@ fn run(pattern: &str, grid: &[Vec<String>]) -> Result<MatchFixtureResult, String
         transformations: atp.transformations.clone(),
         ..InterpreterCfg::default()
     };
-    let rs = interpret(&cfg, &syntax, &sem, None).map_err(|e| err_text(&e))?;
+    let interpretation = interpret(&cfg, &syntax, &sem, None).map_err(|e| err_text(&e))?;
+    let rs = interpretation.recordset;
+    let records = rs
+        .records()
+        .map(|r| {
+            r.iter()
+                .map(|v| v.as_ref().map(|s| s.to_string()))
+                .collect()
+        })
+        .collect();
 
     Ok(MatchFixtureResult {
         table: Vec::new(), // filled by the caller
         cells,
         schema: rs.schema.attributes,
-        records: rs.records.into_iter().map(|r| r.values).collect(),
+        records,
         matched: true,
         error: None,
         expected: None, // filled by the caller
@@ -419,10 +430,91 @@ mod tests {
         assert!(res.matched);
         assert_eq!(res.schema, vec!["City", "Year"]);
         assert_eq!(res.records.len(), 2);
-        assert_eq!(res.records[0], vec![Some("IKT".into()), Some("2020".into())]);
+        assert_eq!(
+            res.records[0],
+            vec![Some("IKT".into()), Some("2020".into())]
+        );
         // Header cells are attributes, data cells are values.
-        assert!(res.cells.iter().any(|c| c.role == "attribute" && c.row == 0));
+        assert!(res
+            .cells
+            .iter()
+            .any(|c| c.role == "attribute" && c.row == 0));
         assert!(res.cells.iter().any(|c| c.role == "value" && c.row > 0));
+    }
+
+    #[test]
+    fn concat_with_named_keys_folds_records() {
+        let grid = vec![
+            vec!["".into(), "".into(), "C".into(), "A".into(), "B".into()],
+            vec![
+                "k1".into(),
+                "k11".into(),
+                "c1".into(),
+                "a1".into(),
+                "b1".into(),
+            ],
+            vec![
+                "k1".into(),
+                "k11".into(),
+                "c2".into(),
+                "a1".into(),
+                "b1".into(),
+            ],
+            vec![
+                "k2".into(),
+                "k22".into(),
+                "c3".into(),
+                "a2".into(),
+                "b2".into(),
+            ],
+            vec![
+                "k2".into(),
+                "k22".into(),
+                "c4".into(),
+                "a2".into(),
+                "b2".into(),
+            ],
+        ];
+        let res = run(
+            "[ [] [] [ATTR]+ ]\n[ [VAL: RT*->REC, (BW&STR)*->CONCAT(0, 1, 'A', 'B')] [VAL] [VAL] [VAL: COL->AVP]{2} ]+",
+            &grid,
+        )
+        .unwrap();
+        assert!(res.matched, "{:?}", res.error);
+        assert_eq!(
+            res.records,
+            vec![
+                rec(&["k1", "k11", "c1", "a1", "b1", "c2"]),
+                rec(&["k2", "k22", "c3", "a2", "b2", "c4"]),
+            ]
+        );
+    }
+
+    #[test]
+    fn join_produces_the_record_product() {
+        let grid = vec![
+            vec!["id".into(), "x".into(), "y".into()],
+            vec!["a;b".into(), "1".into(), "2".into()],
+            vec!["c".into(), "3".into(), "4".into()],
+        ];
+        let res = run(
+            "[ [ATTR] [VAL: 'var'->AVP]+ ]\n[ [(VAL: COL->AVP, ()->REC, RT*->JOIN){';'}] [VAL: 'value'->AVP, COL->REC]+ ]+",
+            &grid,
+        )
+        .unwrap();
+        assert!(res.matched, "{:?}", res.error);
+        assert_eq!(res.schema, vec!["id", "value", "var"]);
+        assert_eq!(
+            res.records,
+            vec![
+                rec(&["a", "1", "x"]),
+                rec(&["a", "2", "y"]),
+                rec(&["b", "1", "x"]),
+                rec(&["b", "2", "y"]),
+                rec(&["c", "3", "x"]),
+                rec(&["c", "4", "y"]),
+            ]
+        );
     }
 
     /// `AVP` names the attributes and `<ANCH(1)>` moves the anchor attribute --

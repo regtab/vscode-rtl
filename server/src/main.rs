@@ -22,7 +22,7 @@ use tower_lsp::{Client, LanguageServer, LspService, Server};
 
 /// Version of the normative RTL grammar the bundled compiler implements.
 /// Reported in the `initialize` response (plan §6).
-const GRAMMAR_VERSION: &str = "RTL grammar jRegTab 0.5.1";
+const GRAMMAR_VERSION: &str = "RTL grammar jRegTab 0.7.1";
 const DEBOUNCE: Duration = Duration::from_millis(150);
 
 #[derive(Default)]
@@ -141,7 +141,10 @@ impl LanguageServer for Backend {
                 hover_provider: Some(HoverProviderCapability::Simple(true)),
                 completion_provider: Some(CompletionOptions {
                     trigger_characters: Some(
-                        [">", "$", "#", "=", "<"].iter().map(|s| s.to_string()).collect(),
+                        [">", "$", "#", "=", "<"]
+                            .iter()
+                            .map(|s| s.to_string())
+                            .collect(),
                     ),
                     ..CompletionOptions::default()
                 }),
@@ -159,7 +162,10 @@ impl LanguageServer for Backend {
 
     async fn initialized(&self, _: InitializedParams) {
         self.client
-            .log_message(MessageType::INFO, format!("rtl-lsp ready ({GRAMMAR_VERSION})"))
+            .log_message(
+                MessageType::INFO,
+                format!("rtl-lsp ready ({GRAMMAR_VERSION})"),
+            )
             .await;
     }
 
@@ -391,7 +397,7 @@ fn completions_at(text: &str, pos: Position) -> Vec<CompletionItem> {
         ..CompletionItem::default()
     };
     match completion_ctx(&prefix) {
-        CompletionCtx::Actions => ["REC", "AVP", "JOIN", "FILL", "PREFIX", "SUFFIX"]
+        CompletionCtx::Actions => ["REC", "AVP", "CONCAT", "JOIN", "FILL", "PREFIX", "SUFFIX"]
             .iter()
             .map(|k| item(k, CompletionItemKind::FUNCTION, "interpretation action"))
             .collect(),
@@ -432,9 +438,15 @@ fn completions_at(text: &str, pos: Position) -> Vec<CompletionItem> {
         CompletionCtx::General => {
             let mut out: Vec<CompletionItem> = Vec::new();
             for k in ["VAL", "ATTR", "AUX", "SKIP"] {
-                out.push(item(k, CompletionItemKind::KEYWORD, "item derivation directive"));
+                out.push(item(
+                    k,
+                    CompletionItemKind::KEYWORD,
+                    "item derivation directive",
+                ));
             }
-            for k in ["LT", "RT", "AV", "BW", "ROW", "COL", "SR", "SC", "ST", "NCL", "CL"] {
+            for k in [
+                "LT", "RT", "AV", "BW", "ROW", "COL", "SR", "SC", "ST", "NCL", "CL",
+            ] {
                 out.push(item(k, CompletionItemKind::CONSTANT, "spatial constraint"));
             }
             for k in ["BLANK", "STR", "EXT"] {
@@ -457,7 +469,11 @@ fn document_symbols(text: &str) -> Vec<DocumentSymbol> {
             deprecated: None,
             range,
             selection_range: range,
-            children: if children.is_empty() { None } else { Some(children) },
+            children: if children.is_empty() {
+                None
+            } else {
+                Some(children)
+            },
         }
     };
 
@@ -716,14 +732,20 @@ mod tests {
     #[test]
     fn unknown_position_maps_to_document_start() {
         let r = error_range("x", -1, -1);
-        assert_eq!((r.start.line, r.start.character, r.end.character), (0, 0, 1));
+        assert_eq!(
+            (r.start.line, r.start.character, r.end.character),
+            (0, 0, 1)
+        );
     }
 
     #[test]
     fn canonical_form_desugars_and_is_idempotent() {
         // Inherited action: `->REC` on the cell is pushed down to the atom.
         let canon = canonical_form("[ [VAL : ST*->REC] ]+").expect("canonical form");
-        assert!(!canon.contains("//"), "no comments in canonical form: {canon}");
+        assert!(
+            !canon.contains("//"),
+            "no comments in canonical form: {canon}"
+        );
         let again = canonical_form(&canon).expect("canonical form recompiles");
         assert_eq!(canon, again, "canonicalization must be idempotent");
     }
@@ -746,29 +768,37 @@ mod tests {
         let text = "$V=[VAL: 'X'->AVP]\n[ [$V]{4} [VAL : ST*->REC] ]+";
         // Keyword: VAL (line 0, col 4..7)
         let h = hover_at(text, Position::new(0, 5)).expect("VAL hover");
-        let HoverContents::Markup(m) = h.contents else { panic!() };
+        let HoverContents::Markup(m) = h.contents else {
+            panic!()
+        };
         assert!(m.value.contains("Item derivation directive"), "{}", m.value);
         // Spatial: ST
         let h = hover_at(text, Position::new(1, 17)).expect("ST hover");
-        let HoverContents::Markup(m) = h.contents else { panic!() };
+        let HoverContents::Markup(m) = h.contents else {
+            panic!()
+        };
         assert!(m.value.contains("Spatial constraint"), "{}", m.value);
         // Fragment reference: shows the definition line
         let h = hover_at(text, Position::new(1, 4)).expect("$V hover");
-        let HoverContents::Markup(m) = h.contents else { panic!() };
+        let HoverContents::Markup(m) = h.contents else {
+            panic!()
+        };
         assert!(m.value.contains("defined at line 1"), "{}", m.value);
         // Arrow
         let h = hover_at(text, Position::new(0, 12)).expect("-> hover");
-        let HoverContents::Markup(m) = h.contents else { panic!() };
+        let HoverContents::Markup(m) = h.contents else {
+            panic!()
+        };
         assert!(m.value.contains("Action arrow"), "{}", m.value);
     }
 
     #[test]
     fn every_grammar_keyword_has_hover() {
         for kw in [
-            "NORM", "ANCH", "SPLIT", "SUBSTR", "REPL", "UC", "LC", "TRIM", "ATTR", "VAL",
-            "AUX", "SKIP", "FILL", "PREFIX", "SUFFIX", "AVP", "REC", "JOIN", "LT", "RT",
-            "AV", "BW", "ROW", "COL", "SR", "SC", "ST", "NCL", "CL", "BLANK", "STR", "EXT",
-            "C", "R", "P",
+            "NORM", "ANCH", "SPLIT", "SUBSTR", "REPL", "UC", "LC", "TRIM", "ATTR", "VAL", "AUX",
+            "SKIP", "FILL", "PREFIX", "SUFFIX", "AVP", "REC", "CONCAT", "JOIN", "LT", "RT", "AV",
+            "BW", "ROW", "COL", "SR", "SC", "ST", "NCL", "CL", "BLANK", "STR", "EXT", "C", "R",
+            "P",
         ] {
             assert!(lookup(kw).is_some(), "no hover for {kw}");
         }
@@ -778,11 +808,15 @@ mod tests {
     fn completion_is_contextual() {
         let text = "$HEAD=[VAL #'H']\n[ [VAL : ST*->";
         let labels = |pos: Position| -> Vec<String> {
-            completions_at(text, pos).into_iter().map(|c| c.label).collect()
+            completions_at(text, pos)
+                .into_iter()
+                .map(|c| c.label)
+                .collect()
         };
         // After the arrow: actions only — no providers.
         let after_arrow = labels(Position::new(1, 14));
         assert!(after_arrow.contains(&"REC".to_string()));
+        assert!(after_arrow.contains(&"CONCAT".to_string()));
         assert!(!after_arrow.contains(&"ROW".to_string()));
         // General position: providers, no actions.
         let general = labels(Position::new(1, 3));

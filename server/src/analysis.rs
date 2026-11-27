@@ -89,7 +89,11 @@ pub fn fragment_occurrences(text: &str) -> Vec<FragOcc> {
                         k3 += 1;
                     }
                     let is_def = k3 < code.len() && code[k3].2 && code[k3].1 == '=';
-                    let end = if k2 < code.len() { code[k2].0 } else { i + 1 + name.len() };
+                    let end = if k2 < code.len() {
+                        code[k2].0
+                    } else {
+                        i + 1 + name.len()
+                    };
                     out.push(FragOcc {
                         name: name.to_lowercase(),
                         line: lineno as u32,

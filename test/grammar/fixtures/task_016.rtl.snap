@@ -1,4 +1,4 @@
->[ [VAL : RT->REC, BW&STR*->JOIN(0)] [VAL] ]+
+>[ [VAL : RT->REC, BW&STR*->CONCAT(0)] [VAL] ]+
 #^ source.rtl entity.name.function.row.bracket.rtl
 # ^ source.rtl
 #  ^ source.rtl punctuation.section.cell.bracket.rtl
@@ -16,16 +16,16 @@
 #                     ^^^ source.rtl constant.language.content.rtl
 #                        ^ source.rtl keyword.operator.quantifier.rtl
 #                         ^^ source.rtl keyword.operator.arrow.rtl
-#                           ^^^^ source.rtl keyword.control.action.rtl
-#                               ^ source.rtl punctuation.section.bracket.rtl
-#                                ^ source.rtl constant.numeric.rtl
+#                           ^^^^^^ source.rtl keyword.control.action.rtl
 #                                 ^ source.rtl punctuation.section.bracket.rtl
-#                                  ^ source.rtl punctuation.section.cell.bracket.rtl
-#                                   ^ source.rtl
+#                                  ^ source.rtl constant.numeric.rtl
+#                                   ^ source.rtl punctuation.section.bracket.rtl
 #                                    ^ source.rtl punctuation.section.cell.bracket.rtl
-#                                     ^^^ source.rtl storage.type.item.rtl
-#                                        ^ source.rtl punctuation.section.cell.bracket.rtl
-#                                         ^ source.rtl
-#                                          ^ source.rtl entity.name.function.row.bracket.rtl
-#                                           ^ source.rtl keyword.operator.quantifier.rtl
+#                                     ^ source.rtl
+#                                      ^ source.rtl punctuation.section.cell.bracket.rtl
+#                                       ^^^ source.rtl storage.type.item.rtl
+#                                          ^ source.rtl punctuation.section.cell.bracket.rtl
+#                                           ^ source.rtl
+#                                            ^ source.rtl entity.name.function.row.bracket.rtl
+#                                             ^ source.rtl keyword.operator.quantifier.rtl
 >

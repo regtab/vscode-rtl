@@ -31,10 +31,17 @@ fn corpus(sub: &str) -> Vec<(String, String)> {
 #[test]
 fn positive_corpus_is_clean() {
     let cases = corpus("positive");
-    assert!(cases.len() >= 150, "expected ≥150 cases, got {}", cases.len());
+    assert!(
+        cases.len() >= 150,
+        "expected ≥150 cases, got {}",
+        cases.len()
+    );
     for (name, text) in cases {
         if let Err(e) = compile_permissive(&text) {
-            panic!("{name}: unexpected diagnostic at {}:{}: {}", e.line, e.col, e.msg);
+            panic!(
+                "{name}: unexpected diagnostic at {}:{}: {}",
+                e.line, e.col, e.msg
+            );
         }
     }
 }
@@ -60,6 +67,7 @@ fn negative_corpus_positions() {
     let expected: &[(&str, i64, i64)] = &[
         ("conflict_anch_rec", -1, -1),
         ("conflict_rec_rec", -1, -1),
+        ("concat_empty_key_name", 1, 30),
         ("ext_bad_position", 1, 3),
         ("ext_blank_name", 1, 3),
         ("lexer_bad_char", 1, 6),
@@ -69,6 +77,7 @@ fn negative_corpus_positions() {
         ("parser_parens_condcontspec", 1, 3),
         ("parser_question_without_contspec", 1, 10),
         ("parser_unclosed_bracket", 2, 0),
+        ("quantifier_exactly_negative", 1, 8),
         ("semantic_unknown_fragment", -1, -1),
         ("settings_unknown", 1, 1),
     ];

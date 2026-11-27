@@ -5,6 +5,18 @@ The extension follows [semver](https://semver.org) independently of
 jRegTab/pyRegTab versions; the pinned normative grammar version is recorded
 in the README.
 
+## 0.9.0
+
+- The language server is pinned to pyRegTab `v0.7.4`; the normative grammar and
+  conformance corpus are synchronized with jRegTab 0.7.1.
+- `JOIN` now implements record products and equi-joins. The former folding
+  operation `JOIN(K)` is spelled `CONCAT(K)`; existing 0.5.x patterns must be
+  migrated. Both operations accept attribute names as well as positions in K.
+- Exact quantifiers accept `{0}` and `{1}`, and zero-width subrows match the
+  empty sequence without repeating indefinitely.
+- Highlighting, completion, hover documentation, and snippets now cover
+  `CONCAT` and the new action semantics.
+
 ## 0.8.9
 
 - The language server is pinned to pyRegTab `v0.5.1`, which fixes `ANCH(n)` and

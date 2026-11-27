@@ -7,13 +7,13 @@ in the README.
 
 ## 0.8.9
 
-- Language server pinned to pyRegTab `v0.5.1`, which fixes `ANCH(n)` and
+- The language server is pinned to pyRegTab `v0.5.1`, which fixes `ANCH(n)` and
   `REC(n)`: the transformation now moves the anchor attribute itself — its
   name together with its values — so patterns that name attributes through
   `AVP` keep every record's name-value pairs and only the schema order
-  changes. Previously the column carrying the anchor's name received another
-  attribute's values, and the match preview showed that wrong header.
-- On an anonymous schema the values and their positions are unchanged, but
+  changes. Previously, the column carrying the anchor's name received another
+  attribute's values, and the match preview showed that incorrect header.
+- For an anonymous schema, the values and their positions are unchanged, but
   the `$a_i` names now travel with their attributes instead of being
   renumbered, so a four-attribute schema under `ANCH(2)` reads
   `$a_2, $a_3, $a_1, $a_4` in the preview header.
@@ -24,14 +24,14 @@ in the README.
 
 ## 0.8.8
 
-- Language server pinned to pyRegTab `v0.5.0` instead of tracking `main`, so
-  RTL execution semantics can no longer change under the extension between
+- The language server is pinned to pyRegTab `v0.5.0` instead of tracking `main`,
+  so RTL execution semantics can no longer change under the extension between
   builds.
 - pyRegTab 0.5.0 changes the delimited content specification `(VAL){","}`:
   tokens are passed through verbatim — surrounding whitespace is kept and
   empty tokens derive items. Trimming is opt-in via `(VAL=TRIM){","}`. The
-  match preview now marks empty items with a slim coloured bar in the item's
-  role colour instead of silently omitting them.
+  match preview now marks empty items with a thin colored bar in the item's
+  role color instead of silently omitting them.
 - Item tooltips in the match preview show the extracted string again — an
   unescaped quote used to truncate every tooltip right after the arrow.
 - Hover text for the `TRIM` and `NORM` extractors now says what each one
@@ -219,9 +219,10 @@ in the README.
 
 ## 0.2.0
 
-- Compile diagnostics via `rtl-lsp`, a standalone native language server built
-  on the pyRegTab Rust core (grammar parity: jRegTab 0.4.1). No Python, JDK or
-  RegTab installation is required — platform-specific VSIXes bundle the binary.
+- Compiler diagnostics via `rtl-lsp`, a standalone native language server built
+  on the pyRegTab Rust core (grammar parity: jRegTab 0.4.1). No Python, JDK, or
+  RegTab installation is required — platform-specific VSIX packages bundle the
+  binary.
 - Permissive compilation: `EXT('name')` predicates are never reported as
   unbound during standalone editing (they resolve against host-runtime
   `Bindings` only at run time).

@@ -6,7 +6,7 @@ on:
   pull_request:
 
 jobs:
-  # Declarative layer + client: grammar snapshots, sync-check, types, bundle,
+  # Declarative layer + client: grammar snapshots, sync check, types, bundle,
   # universal VSIX (no server binary — the platform fallback path).
   extension:
     runs-on: ubuntu-latest
@@ -34,7 +34,7 @@ jobs:
       - name: Unit tests (literal extraction)
         run: npm run test:unit
 
-      - name: Grammar sync-check (RTL.g4 <-> tmLanguage)
+      - name: Grammar sync check (RTL.g4 <-> tmLanguage)
         run: python tools/check_grammar_sync.py
         env:
           JREGTAB_TOKEN: ${{ secrets.JREGTAB_TOKEN }}

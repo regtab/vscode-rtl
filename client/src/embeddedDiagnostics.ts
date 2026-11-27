@@ -2,14 +2,14 @@ import * as vscode from "vscode";
 import { LanguageClient } from "vscode-languageclient/node";
 import { findRtlLiterals, RtlLiteral } from "./literals";
 
-/** Diagnostics for RTL embedded in Python/Java string literals (plan §5,
+/** Diagnostics for RTL embedded in Python and Java string literals (plan §5,
  * phase 5 step 1): each extracted literal is compiled via the `rtl/check`
  * custom request, and the returned ranges — expressed in the coordinates of
  * the extracted text — are mapped back into the host document through the
- * literal's offset map (unescaping and text-block indent stripping make the
- * extraction non-1:1). */
+ * literal's offset map. Unescaping and text-block indentation removal mean that
+ * extracted offsets do not map one-to-one to host offsets. */
 
-/** Shape of `tower_lsp::lsp_types::Diagnostic` we consume. */
+/** Subset of `tower_lsp::lsp_types::Diagnostic` used by the client. */
 interface LspDiagnostic {
   range: {
     start: { line: number; character: number };
@@ -33,9 +33,9 @@ export function registerEmbeddedDiagnostics(
       collection.delete(doc.uri);
       return;
     }
-    // A literal present means RTL is actually in use in this host file —
-    // that justifies starting the server (same lazy rule as diagnostics
-    // for .rtl documents and preview requests).
+    // The presence of a literal confirms that this host file uses RTL, which
+    // justifies starting the server (the same lazy rule applies to diagnostics
+    // for `.rtl` documents and preview requests).
     const client = await ensureServer();
     if (!client) {
       return;

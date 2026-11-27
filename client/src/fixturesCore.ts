@@ -5,9 +5,9 @@ import * as path from "path";
  * shared between the preview and the Test Explorer). */
 
 /** `// <kind>: path` directive values resolved against `dir`, in order.
- * `${workspaceFolder}` in a value substitutes to `workspaceFolder` (falling
- * back to `dir` outside a workspace) — for host files nested deep away from
- * their fixtures, where a relative path would be a `../../..` chain. */
+ * `${workspaceFolder}` in a value is replaced with `workspaceFolder` (falling
+ * back to `dir` outside a workspace) — useful for host files located far from
+ * their fixtures, where a relative path would require a `../../..` chain. */
 export function directivePaths(
   rtlText: string,
   dir: string,
@@ -20,8 +20,8 @@ export function directivePaths(
   );
 }
 
-/** The expected file paired with `inputPath`: a single expected serves every
- * input; otherwise the sorted lists pair positionally (plan §5, phase 4
+/** The expected CSV paired with `inputPath`: a single expected CSV applies to
+ * every input; otherwise the sorted lists pair positionally (plan §5, phase 4
  * item 5 — mirrors the harness convention `input_k.csv` ↔ `expected_k.csv`). */
 export function pairExpected(
   inputPath: string,
@@ -35,12 +35,13 @@ export function pairExpected(
   return i >= 0 ? expecteds[i] : undefined;
 }
 
-/** Substitute ${basename}/${dir}/${workspaceFolder} and expand a trailing
- * `*` glob segment (magic in directory segments is not supported).
- * `${basename/regex/replacement/flags}` applies a snippet-style transform —
- * for host files whose names don't literally match the fixture layout
- * (e.g. `RtlTask001Test` → `task_001`). An invalid regex leaves the
- * variable untouched, so the failure is visible in the resulting path. */
+/** Substitute `${basename}`, `${dir}`, and `${workspaceFolder}` and expand a
+ * trailing `*` glob segment (wildcards in directory segments are not
+ * supported). `${basename/regex/replacement/flags}` applies a snippet-style
+ * transform for host files whose names do not directly match the fixture layout
+ * (for example, `RtlTask001Test` → `task_001`). An invalid regular expression
+ * leaves the variable untouched, so the failure is visible in the resulting
+ * path. */
 export function expandTemplate(
   template: string,
   patternPath: string,

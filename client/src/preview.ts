@@ -119,7 +119,7 @@ export class PreviewManager {
       literal = { text: lit.text, index: target.litIndex };
     }
     // Re-resolved on every refresh: an edited `// expected:` directive or a
-    // changed setting takes effect on the next re-run.
+    // changed setting takes effect on the next rerun.
     const expected = expectedFor(doc, target.fixture, literal);
     try {
       const result = await client.sendRequest<MatchFixtureResult>("rtl/matchFixture", {
@@ -176,9 +176,9 @@ function render(r: MatchFixtureResult, fixtureName: string): string {
   .value { background: rgba(64, 160, 64, 0.35); border-radius: 2px; }
   .attribute { background: rgba(64, 128, 224, 0.35); border-radius: 2px; }
   .auxiliary { background: rgba(224, 160, 32, 0.35); border-radius: 2px; }
-  /* An empty item has no glyph to carry the role colour, so the 0.35 alpha
+  /* An empty item has no glyph to carry the role color, so the 0.35 alpha
      used for text runs leaves the marker at ~1.5:1 against the background.
-     Give the marker the role colour at full opacity — same legend, readable
+     Give the marker the role color at full opacity — same legend, readable
      in both themes. */
   .empty { display: inline-block; width: 4px; height: 1em; vertical-align: text-bottom; }
   .value.empty { background: rgb(64, 160, 64); }

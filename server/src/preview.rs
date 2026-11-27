@@ -15,30 +15,31 @@ use serde::{Deserialize, Serialize};
 pub struct MatchFixtureParams {
     pub pattern_uri: String,
     pub fixture_path: String,
-    /// RTL source extracted by the client (e.g. from a host-language string
-    /// literal, plan §5 phase 5 step 0). When present, it wins over reading
-    /// the document at `pattern_uri`.
+    /// RTL source extracted by the client (for example, from a host-language
+    /// string literal; plan §5 phase 5 step 0). When provided, it takes
+    /// precedence over the document at `pattern_uri`.
     #[serde(default)]
     pub pattern_text: Option<String>,
-    /// Expected recordset to diff against (plan §5, phase 4 item 5).
+    /// Expected recordset to compare against (plan §5, phase 4 item 5).
     #[serde(default)]
     pub expected: Option<ExpectedSpec>,
 }
 
-/// What to compare the extracted recordset with, and how. The comparison
-/// semantics mirror the data-wrangling-eval harness (`harness/compare.py`):
-/// a row is an ordered tuple of cells (column order significant), rows are
-/// compared as a multiset unless `ordered_rows`, cells compare exactly.
+/// Expected recordset and the options used to compare it with the extracted
+/// recordset. The comparison semantics mirror the data-wrangling-eval harness
+/// (`harness/compare.py`): a row is an ordered tuple of cells (column order is
+/// significant), rows are compared as a multiset unless `ordered_rows` is true,
+/// and cells are compared exactly.
 #[derive(Debug, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct ExpectedSpec {
     /// Path of the expected CSV.
     pub path: String,
-    /// First expected row holds column names: it is checked positionally
-    /// against the recordset schema, the rest are data rows.
+    /// The first expected row contains column names and is checked positionally
+    /// against the recordset schema; the remaining rows are data rows.
     #[serde(default)]
     pub has_header: bool,
-    /// Row order is significant (bag comparison otherwise).
+    /// Whether row order is significant; otherwise, multiset comparison is used.
     #[serde(default)]
     pub ordered_rows: bool,
 }

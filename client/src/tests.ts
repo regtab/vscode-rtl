@@ -65,7 +65,7 @@ export function registerTests(
     }
   };
 
-  // Discovery is lazy (first opening of the Testing view) and re-runs on
+  // Discovery is lazy (first opening of the Testing view) and reruns on
   // demand, on .rtl file events and on fixture-settings changes.
   ctrl.resolveHandler = async (item) => {
     if (!item) {

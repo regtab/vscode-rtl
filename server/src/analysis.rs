@@ -1,7 +1,8 @@
 //! Text-level analysis shared by hover, completion and $fragment navigation.
 //!
-//! Fragment identifiers are case-insensitive (RTL tokens are), so names are
-//! compared lower-cased. Scanning skips comments and string literals.
+//! Fragment identifiers are case-insensitive (as are RTL tokens), so names are
+//! converted to lowercase before comparison. Scanning skips comments and string
+//! literals.
 
 /// A `$name` occurrence: 0-based line, char columns [start, end) including `$`.
 #[derive(Debug, PartialEq, Clone)]

@@ -104,7 +104,7 @@ describe("RTL extension smoke", () => {
         expected: { path: path.join(dir, expectedCsv) },
       });
 
-    // Bag semantics: rows in a different order still pass.
+    // Multiset semantics: rows in a different order still pass.
     const good = await ask("good.csv");
     assert.strictEqual(good.expected.pass, true, JSON.stringify(good.expected));
 

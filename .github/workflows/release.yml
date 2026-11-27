@@ -1,6 +1,7 @@
-# Release (plan §6): on a v* tag — matrix-build rtl-lsp for 7 targets, package
-# one VSIX per target plus the universal fallback, publish to the VS Code
-# Marketplace and Open VSX, attach everything to a GitHub Release.
+# Release (plan §6): on a v* tag, use a build matrix to compile rtl-lsp for
+# seven targets, package one VSIX per target plus the universal fallback,
+# publish to the VS Code Marketplace and Open VSX, and attach everything to a
+# GitHub Release.
 #
 # Publishing happens only on an explicit tag push by a maintainer.
 # Secrets: VSCE_PAT (Azure DevOps, publisher `regtab`), OVSX_PAT (Eclipse).
@@ -121,7 +122,7 @@ jobs:
           VSCE_PAT: ${{ secrets.VSCE_PAT }}
         run: |
           if [ -z "$VSCE_PAT" ]; then
-            echo "VSCE_PAT is not set — skipping the Marketplace, the GitHub Release still gets the VSIXes"
+            echo "VSCE_PAT is not set — skipping Marketplace publication; the GitHub Release still includes the VSIX packages"
             exit 0
           fi
           for f in vsix/*.vsix; do

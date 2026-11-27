@@ -309,7 +309,7 @@ impl LanguageServer for Backend {
     }
 }
 
-/// The lower-cased fragment name under the cursor, if any.
+/// The fragment name under the cursor, converted to lowercase, if any.
 fn fragment_at(text: &str, pos: Position) -> Option<String> {
     let line = text.lines().nth(pos.line as usize)?;
     let (word, _, _) = word_at(line, pos.character as usize)?;
@@ -565,7 +565,7 @@ fn document_symbols(text: &str) -> Vec<DocumentSymbol> {
     out
 }
 
-/// Params of the custom request `rtl/check` (plan §5, phase 5 step 1):
+/// Parameters of the custom request `rtl/check` (plan §5, phase 5 step 1):
 /// compile a client-extracted pattern (a host-language string literal) and
 /// return the diagnostics in the coordinates of the extracted text — the
 /// client maps them back into the host document through its offset map.
@@ -575,15 +575,15 @@ struct CheckParams {
     text: String,
 }
 
-/// Params/result of the custom request `rtl/canonicalize` (plan §5, phase 3
-/// item 5 as amended 2026-07-17): the canonical form of a pattern for a
-/// read-only view — `compile_permissive` → `AtpToRtlSerializer`.
+/// Parameters of the custom request `rtl/canonicalize` (plan §5, phase 3 item
+/// 5 as amended 2026-07-17): the canonical form of a pattern for a read-only
+/// view — `compile_permissive` → `AtpToRtlSerializer`.
 #[derive(Debug, Deserialize)]
 #[serde(rename_all = "camelCase")]
 struct CanonicalizeParams {
     pattern_uri: String,
     /// RTL source extracted by the client (host-language string literals);
-    /// wins over reading the document at `pattern_uri`.
+    /// takes precedence over the document at `pattern_uri`.
     #[serde(default)]
     pattern_text: Option<String>,
 }
@@ -597,9 +597,10 @@ struct CanonicalizeResult {
     error: Option<String>,
 }
 
-/// Canonical (normalized) form of the pattern: inherited actions are pushed
-/// down to atoms, layout and comments are not preserved — same form as the
-/// `.expected.rtl` files of the conformance corpus.
+/// Canonical (normalized) form of the pattern: inherited actions are expanded
+/// at the atom level, and the original formatting and comments are not
+/// preserved. This is the same form as the `.expected.rtl` files of the
+/// conformance corpus.
 fn canonical_form(text: &str) -> std::result::Result<String, String> {
     let atp = pyregtab::rtl::compile_permissive(text).map_err(|e| {
         if e.line >= 0 {

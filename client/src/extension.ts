@@ -23,20 +23,21 @@ export interface RtlExtensionApi {
 export async function activate(
   context: vscode.ExtensionContext
 ): Promise<RtlExtensionApi> {
-  // Cheap, always: register commands and CodeLens providers. The extension
-  // also activates on Python/Java (see activationEvents) so the preview lens
-  // shows on RTL string literals — but the server is started lazily below,
-  // never merely because a host-language file is open.
+  // Register commands and CodeLens providers without starting the server.
+  // The extension also activates for Python and Java (see activationEvents),
+  // so the preview lens appears on RTL string literals. The server starts
+  // lazily below, never merely because a host-language file is open.
   registerPreview(context, () => ensureServer(context));
-  // Test Explorer (plan §5, phase 4 item 6). Cheap to create: discovery runs
-  // when the Testing view is first opened, the server on the first run.
+  // Test Explorer (plan §5, phase 4 item 6). Discovery runs when the Testing
+  // view is first opened; the server starts on the first test run.
   registerTests(context, () => ensureServer(context));
-  // Diagnostics inside Python/Java RTL literals (plan §5, phase 5 step 1).
-  // Starts the server only when a host file actually contains RTL literals.
+  // Diagnostics for RTL inside Python and Java literals (plan §5, phase 5
+  // step 1). The server starts only when a host file contains RTL literals.
   registerEmbeddedDiagnostics(context, () => ensureServer(context));
 
-  // Start the server when RTL is actually used: an open .rtl document (for
-  // diagnostics) now or later. Preview requests start it on demand too.
+  // Start the server when RTL is actually used: when an `.rtl` document is
+  // opened for diagnostics, either at activation or later. Preview requests
+  // also start it on demand.
   const startIfRtl = () => {
     if (vscode.workspace.textDocuments.some((d) => d.languageId === "rtl")) {
       void ensureServer(context);

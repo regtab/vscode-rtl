@@ -1,15 +1,14 @@
-"""Generate the rtl-lsp hover dictionary from pyregtab's docs/rtl-reference.md.
+"""Generate the rtl-lsp hover dictionary from pyRegTab's docs/rtl-reference.md.
 
 The reference is the single source of truth for token semantics (plan §5,
-phase 3 item 1). This script harvests its Markdown tables and emits
-`server/src/hover_data.rs`; when the reference changes upstream, re-run and
-commit the regenerated file in the same PR.
+phase 3 item 1). This script extracts its Markdown tables and emits
+`server/src/hover_data.rs`; when the reference changes upstream, rerun the
+script and commit the regenerated file in the same PR.
 
 Usage:
     python tools/gen_hover_data.py [path/to/rtl-reference.md]
 
-Default reference path: ../pyregtab/docs/rtl-reference.md (sibling checkout,
-same layout the server's path dependency uses).
+Default reference path: ../pyregtab/docs/rtl-reference.md (a sibling checkout).
 """
 
 from __future__ import annotations

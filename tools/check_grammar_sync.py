@@ -1,21 +1,22 @@
 """Keep the TextMate grammar in sync with the normative RTL grammar (plan §5, phase 1).
 
-This repository is the canonical home of the RTL tmLanguage grammars, while the
+This repository is the canonical home of the RTL TextMate grammars, while the
 normative grammar `RTL.g4` lives in jRegTab (a pinned verbatim copy is vendored
-here in `grammar/`). Two things can drift, and this check catches both:
+here in `grammar/`). The check detects three kinds of drift:
 
 1. Pin integrity (offline, always): the SHA-256 of `grammar/RTL.g4` must equal
-   the `sha256:` recorded in `grammar/UPSTREAM`. Catches any local edit of the
-   vendored copy. (Ported from pyregtab's tools/check_grammar_sync.py.)
+   the `sha256:` recorded in `grammar/UPSTREAM`. This catches any local edit of
+   the vendored copy. (Ported from pyRegTab's tools/check_grammar_sync.py.)
 2. Keyword coverage: every keyword token of `RTL.g4` must be matched by some
    pattern of `syntaxes/rtl.tmLanguage.json`, and every keyword-looking word in
-   the tmLanguage must exist in `RTL.g4`. Catches a grammar re-sync that was not
-   accompanied by a tmLanguage update, and stale keywords left in the tmLanguage.
-3. Upstream cross-check (opt-in): with a `JREGTAB_TOKEN` env var that can read
-   the private jRegTab repo, fetch the grammar at the pinned commit and assert
-   byte-identity with the vendored copy.
+   the TextMate grammar must exist in `RTL.g4`. This catches a grammar re-sync
+   that was not accompanied by a TextMate grammar update, as well as stale
+   keywords left in the TextMate grammar.
+3. Upstream cross-check (opt-in): with a `JREGTAB_TOKEN` environment variable
+   that can read the private jRegTab repository, fetch the grammar at the pinned
+   commit and assert byte-for-byte identity with the vendored copy.
 
-Exit code 0 = in sync, 1 = drift detected.
+Exits with code 0 when synchronized and code 1 when drift is detected.
 
 Usage: python tools/check_grammar_sync.py
 """

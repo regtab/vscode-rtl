@@ -68,12 +68,11 @@ export function fixtureCandidates(
 
 /** The expected CSV paired with `inputPath`, or undefined (plan §5, phase 4
  * item 5). Sources, most specific first:
- * 1. `// expected:` directives — the i-th pairs with the i-th `// fixture:`
- *    directive; a lone one applies to any input.
- * 2. `rtl.fixtures.expected` — template/rules symmetric to
- *    `rtl.fixtures.input`; a multi-file expansion pairs with the input
- *    expansion positionally (both are sorted), a single file applies to
- *    every input. */
+ * 1. `// expected:` directives — expected and fixture directives are paired by
+ *    position; a single expected directive applies to every input.
+ * 2. `rtl.fixtures.expected` — a template or rule array corresponding to
+ *    `rtl.fixtures.input`; a multi-file expansion pairs positionally with the
+ *    sorted input expansion, while a single file applies to every input. */
 export function expectedFor(
   doc: vscode.TextDocument,
   inputPath: string,
@@ -112,7 +111,7 @@ export function expectedFor(
     : undefined;
 }
 
-/** Comparison options: rule-level override wins over the global settings. */
+/** Comparison options: a rule-level override takes precedence over the global settings. */
 export function expectedOptions(
   uri: vscode.Uri,
   rule?: ExpectedRule

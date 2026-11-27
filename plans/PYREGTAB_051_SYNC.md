@@ -169,10 +169,10 @@ upstream, а не был выдуман:
    - `server/src/main.rs:25` — `GRAMMAR_VERSION = "RTL grammar jRegTab 0.5.1"`
      (уходит в ответ `initialize`; тестами не проверяется);
    - `README.md:159` — `…from **jRegTab 0.5.1**`;
-   - `CLAUDE.md:35` — `текущий паритет — jRegTab 0.5.1`.
+   - `AGENTS.md:35` — `текущий паритет — jRegTab 0.5.1`.
 
-3. `CLAUDE.md:40` и `DEVELOPMENT.md:15` — текущий тег ядра `v0.5.0` → `v0.5.1`.
-   **Не трогать** `CLAUDE.md:45` и `DEVELOPMENT.md:21`: там `S_delim` в 0.5.0 —
+3. `AGENTS.md:40` и `DEVELOPMENT.md:15` — текущий тег ядра `v0.5.0` → `v0.5.1`.
+   **Не трогать** `AGENTS.md:45` и `DEVELOPMENT.md:21`: там `S_delim` в 0.5.0 —
    исторический факт, обосновывающий сам пин, а не текущая версия.
 
 4. Фикстуры подсветки — скопировать **оба** новых семантических кейса
@@ -295,8 +295,8 @@ right: ["Dato", "Lokaler", "Klasse"]
 | `server/Cargo.lock:438-439` | `0.5.0`, `#abca0c7f…` | `0.5.1`, `#0eb6ea50…` |
 | `grammar/UPSTREAM:1-2` | `035ff1a…` / `v0.5.0` | `68be345…` / `v0.5.1` |
 | `server/src/main.rs:25` | `jRegTab 0.5.0` | `jRegTab 0.5.1` |
-| `README.md:159`, `CLAUDE.md:35` | `jRegTab 0.5.0` | `jRegTab 0.5.1` |
-| `CLAUDE.md:40`, `DEVELOPMENT.md:15` | `v0.5.0` | `v0.5.1` |
+| `README.md:159`, `AGENTS.md:35` | `jRegTab 0.5.0` | `jRegTab 0.5.1` |
+| `AGENTS.md:40`, `DEVELOPMENT.md:15` | `v0.5.0` | `v0.5.1` |
 | `package.json`, `package-lock.json` | `0.8.8` | `0.8.9` |
 
 **Отклонения от плана (два, оба мелкие):**
@@ -324,7 +324,7 @@ right: ["Dato", "Lokaler", "Klasse"]
   0.5.1 идентична 0.5.0.
 - `server/tests/corpus/**` — корпус compile-only, новые кейсы семантические;
   негативная `conflict_anch_rec.rtl` остаётся валидной.
-- `CLAUDE.md:45`, `DEVELOPMENT.md:21` — историческая ссылка на `S_delim` в 0.5.0.
+- `AGENTS.md:45`, `DEVELOPMENT.md:21` — историческая ссылка на `S_delim` в 0.5.0.
 - Публикация в Marketplace/Open VSX и пуш тега `v*` — только по отдельной команде.
 
 **Бэклог, не в этот PR** (обе проблемы предсуществующие, не вызваны синком):

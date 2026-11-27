@@ -11,7 +11,7 @@ docs/**
 grammar/**
 node_modules/**
 dist/**
-CLAUDE.md
+AGENTS.md
 DEVELOPMENT.md
 .gitignore
 .vscodeignore

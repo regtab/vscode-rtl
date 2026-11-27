@@ -11,13 +11,13 @@ diagnostics → 3: language features → 4: match preview). Consult the plan bef
 changing architectural decisions; every such change must update the plan in the
 same PR.
 
-## Related projects (local paths)
+## Related projects
 
-| Project | Path | What this repository uses |
+| Project | Repository | What this repository uses |
 |---|---|---|
-| pyRegTab | `d:\YandexDisk\code2\pyregtab` | Extension prototype `ide/vscode/` (tmLanguage `.rtl`, Python injection, language-configuration, package.json); normative grammar `grammar/RTL.g4`; Rust compiler core `src/rtl/*` (the foundation for `rtl-lsp`); conformance corpus `conformance/{positive,negative}` (`.rtl` test files); reference guide `docs/rtl-reference.md` (source for hover content and snippets); `tools/check_grammar_sync.py` |
-| jRegTab | `d:\YandexDisk\code2\jregtab` | Origin of the normative `RTL.g4`; ready-made Java injection `ide/vscode/syntaxes/rtl-java-injection.tmLanguage.json`; its own `ide/README.md` |
-| data-wrangling-eval | `d:\YandexDisk\code2\data-wrangling-eval` | Real-world example of standalone `.rtl` usage: solutions `solutions/regtab/task_NNN.rtl`, data `fixtures/task_NNN/{input_k.csv, expected_k.csv, task_match_options.json}` — the reference scenario for preview and `rtl.fixtures.*` |
+| pyRegTab | [regtab/pyregtab](https://github.com/regtab/pyregtab) | Extension prototype `ide/vscode/` (tmLanguage `.rtl`, Python injection, language-configuration, package.json); normative grammar `grammar/RTL.g4`; Rust compiler core `src/rtl/*` (the foundation for `rtl-lsp`); conformance corpus `conformance/{positive,negative}` (`.rtl` test files); reference guide `docs/rtl-reference.md` (source for hover content and snippets); `tools/check_grammar_sync.py` |
+| jRegTab | [regtab/jregtab](https://github.com/regtab/jregtab) | Origin of the normative `RTL.g4`; ready-made Java injection `ide/vscode/syntaxes/rtl-java-injection.tmLanguage.json`; its own `ide/README.md` |
+| data-wrangling-eval | [regtab/data-wrangling-eval](https://github.com/regtab/data-wrangling-eval) | Real-world example of standalone `.rtl` usage: solutions `solutions/regtab/task_NNN.rtl`, data `fixtures/task_NNN/{input_k.csv, expected_k.csv, task_match_options.json}` — the reference scenario for preview and `rtl.fixtures.*` |
 
 ## Key facts and invariants
 
